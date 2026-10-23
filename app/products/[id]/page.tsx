@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
 ArrowLeft,
@@ -250,7 +250,7 @@ features: [
 const formatPrice = (price: number) =>
 `₦${price.toLocaleString("en-NG")}`;
 
-export default function ProductDetailsPage() {
+function ProductDetailsContent() {
 const params = useParams();
 const router = useRouter();
 
@@ -689,11 +689,25 @@ Quality home appliances. Shopping made simple. </div>
     </div>
 
     <div className="mx-auto mt-8 max-w-[1440px] border-t border-white/10 pt-5 text-xs text-blue-100/60">
-      © {new Date().getFullYear()} SONAMA WILLS. All rights reserved.
+      © 2026 SONAMA WILLS. All rights reserved.
     </div>
   </footer>
 </main>
 
 
 );
+}
+
+export default function ProductDetailsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-[#fafafa] text-sm font-semibold text-gray-500">
+          Loading product...
+        </main>
+      }
+    >
+      <ProductDetailsContent />
+    </Suspense>
+  );
 }
