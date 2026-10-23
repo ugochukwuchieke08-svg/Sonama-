@@ -591,7 +591,7 @@ const removeFromCart = (productId: number) => {
 
         <div className="border-t border-white/10">
           <div className="mx-auto flex max-w-[1440px] flex-col justify-between gap-3 px-5 py-6 text-xs text-gray-500 sm:px-8 md:flex-row lg:px-12">
-            <p>© {new Date().getFullYear()} SONAMA WILLS. All rights reserved.</p>
+            <p>© 2026 SONAMA WILLS. All rights reserved.</p>
           </div>
         </div>
       </footer>
