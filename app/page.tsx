@@ -397,7 +397,7 @@ useEffect(() => {
   };
 
   return (
-    <main className="min-h-screen overflow-hidden bg-white text-[#172033]">
+    <main className="min-h-screen overflow-x-clip bg-white text-[#172033]">
       {/* Announcement bar */}
       <div className="relative overflow-hidden bg-[#102746] px-4 py-2.5 text-center text-[11px] font-medium tracking-wide text-white sm:text-xs">
         <span className="announcement-shimmer">
@@ -409,15 +409,15 @@ useEffect(() => {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1500px] items-center gap-5 px-4 py-4 sm:px-8 lg:px-12">
+      <header className="sticky top-0 z-[100] border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[1500px] items-center gap-2 px-3 py-3 sm:gap-5 sm:px-8 sm:py-4 lg:px-12">
           <a href="/" className="shrink-0 transition-transform duration-300 hover:scale-[1.02]">
-            <span className="block text-xl font-black tracking-tight sm:text-2xl">
+            <span className="block whitespace-nowrap text-[15px] font-black tracking-tight sm:text-2xl">
               SONAMA WILLS
               <span className="text-[#1769e0]"> STORE</span>
             </span>
 
-            <span className="mt-0.5 block text-[8px] font-bold tracking-[0.3em] text-gray-400">
+            <span className="mt-0.5 block text-[7px] font-bold tracking-[0.2em] text-gray-400 sm:text-[8px] sm:tracking-[0.3em]">
               ELECTRONICS & HOME
             </span>
           </a>
@@ -810,29 +810,37 @@ useEffect(() => {
       </section>
 
       {/* Shop by Brand */}
-      {brands.length > 0 && (
-        <section className="mx-auto max-w-[1500px] px-4 pb-14 sm:px-8 lg:px-12">
-          <div data-reveal className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#1769e0]">
-                Trusted names
-              </p>
+{brands.length > 0 && (
+  <section className="mx-auto max-w-[1500px] px-4 pb-14 sm:px-8 lg:px-12">
+    <div data-reveal className="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#1769e0]">
+          Trusted names
+        </p>
 
-              <h2 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">
-                Shop by Brand
-              </h2>
+        <h2 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">
+          Shop by Brand
+        </h2>
 
-              <p className="mt-2 text-sm text-gray-500">
-                Explore products from the brands available in our store.
-              </p>
-            </div>
-          </div>
+        <p className="mt-2 text-sm text-gray-500">
+          Explore products from the brands available in our store.
+        </p>
+      </div>
+    </div>
 
-          <div
-            data-reveal
-            className="reveal-stagger mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
-          >
-            {brands.map((brand) => {
+    {/* Independent Brand Rows */}
+    {[0, 1].map((rowIndex) => (
+      <div
+        key={rowIndex}
+        data-reveal
+        className={`brand-scroll reveal-stagger overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2 ${
+          rowIndex === 0 ? "mt-8" : "mt-3"
+        }`}
+      >
+        <div className="flex w-max gap-3">
+          {brands
+            .filter((_, index) => index % 2 === rowIndex)
+            .map((brand) => {
               const count = products.filter(
                 (product) =>
                   product.brand?.toLowerCase() === brand.name.toLowerCase()
@@ -897,9 +905,11 @@ useEffect(() => {
                 </button>
               );
             })}
-          </div>
-        </section>
-      )}
+        </div>
+      </div>
+    ))}
+  </section>
+)}
 
       {/* Products */}
       <section
@@ -977,7 +987,7 @@ useEffect(() => {
                     : "border border-gray-200 bg-white text-gray-600 hover:border-blue-200"
                 }`}
               >
-                All Brands
+                All Brands 
               </button>
 
               {brands.map((brand) => (
@@ -1726,6 +1736,31 @@ useEffect(() => {
         .animate-cart-pop {
           animation: cart-pop 300ms ease-out;
         }
+
+        /* Mobile brand horizontal scrolling */
+.brand-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.brand-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Four-column brand layout on mobile */
+.brand-scroll .brand-card {
+  width: 155px;
+  height: 170px;
+}
+
+/* Larger screens */
+@media (min-width: 640px) {
+  .brand-scroll .brand-card {
+    width: 190px;
+    height: 190px;
+  }
+}
 
         /* Accessibility */
         @media (prefers-reduced-motion: reduce) {
