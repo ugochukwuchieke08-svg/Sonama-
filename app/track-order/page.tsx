@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -8,7 +8,6 @@ import {
   Package,
   Search,
   CheckCircle2,
-  Clock,
   Truck,
   MapPin,
   ShoppingBag,
@@ -18,35 +17,30 @@ import {
 } from "lucide-react";
 
 type OrderItem = {
-  id: number;
+  id: string;
   name: string;
   price: number;
-  quantity?: number;
-  image?: string;
+  quantity: number;
+  image?: string | null;
+  lineTotal?: number;
 };
 
 type Order = {
-  orderNumber?: string;
-  orderId?: string;
-  id?: string | number;
-  customerName?: string;
-  fullName?: string;
-  name?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  streetAddress?: string;
-  city?: string;
-  state?: string;
-  items?: OrderItem[];
-  cartItems?: OrderItem[];
-  total?: number;
-  totalAmount?: number;
-  subtotal?: number;
-  status?: string;
-  paymentMethod?: string;
-  createdAt?: string;
-  date?: string;
+  orderNumber: string;
+  customerName: string;
+  email: string | null;
+  phone: string;
+  address: string;
+  city: string | null;
+  state: string | null;
+  items: OrderItem[];
+  total: number;
+  subtotal: number;
+  deliveryFee: number;
+  status: string;
+  paymentMethod: string;
+  paymentStatus: string;
+  createdAt: string;
 };
 
 const formatPrice = (price: number) =>
@@ -76,7 +70,7 @@ const trackingStages = [
 ];
 
 function getOrderStatus(order: Order) {
-  const status = (order.status || "processing")
+  const status = (order.status || "pending")
     .toLowerCase()
     .replace(/[_-]/g, " ");
 
@@ -103,52 +97,61 @@ function getOrderStatus(order: Order) {
 
 export default function TrackOrderPage() {
   const [orderNumber, setOrderNumber] = useState("");
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [email, setEmail] = useState("");
   const [searched, setSearched] = useState(false);
   const [foundOrder, setFoundOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [trackingError, setTrackingError] = useState("");
 
-  useEffect(() => {
-    try {
-      const savedOrders = localStorage.getItem("sonama-wills-orders");
-
-      if (savedOrders) {
-        const parsed: unknown = JSON.parse(savedOrders);
-
-        if (Array.isArray(parsed)) {
-          setOrders(parsed as Order[]);
-        }
-      }
-    } catch (error) {
-      console.error("Unable to load orders:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const handleTrackOrder = (event: FormEvent<HTMLFormElement>) => {
+  const handleTrackOrder = async (
+    event: FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
 
-    const searchValue = orderNumber.trim().toLowerCase();
+    if (!orderNumber.trim() || !email.trim()) return;
 
-    if (!searchValue) return;
+    setLoading(true);
+    setSearched(false);
+    setFoundOrder(null);
+    setTrackingError("");
 
-    const matchingOrder = orders.find((order) => {
-      const possibleNumbers = [
-        order.orderNumber,
-        order.orderId,
-        order.id,
-      ];
+    try {
+      const response = await fetch("/api/orders/track", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderNumber: orderNumber.trim(),
+          email: email.trim(),
+        }),
+      });
 
-      return possibleNumbers.some(
-        (number) =>
-          number !== undefined &&
-          String(number).trim().toLowerCase() === searchValue
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error || "Unable to find your order."
+        );
+      }
+
+      if (!result.order) {
+        throw new Error("No order information was returned.");
+      }
+
+      setFoundOrder(result.order as Order);
+    } catch (error) {
+      console.error("Order tracking failed:", error);
+
+      setTrackingError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
       );
-    });
-
-    setFoundOrder(matchingOrder || null);
-    setSearched(true);
+    } finally {
+      setLoading(false);
+      setSearched(true);
+    }
   };
 
   const orderStatus = foundOrder
@@ -166,18 +169,18 @@ export default function TrackOrderPage() {
             ? 3
             : -1;
 
-  const items = foundOrder?.items || foundOrder?.cartItems || [];
+  const items = foundOrder?.items || [];
 
   const calculatedTotal = items.reduce(
-    (sum, item) => sum + item.price * (item.quantity || 1),
+    (sum, item) =>
+      sum + item.price * (item.quantity || 1),
     0
   );
 
-  const orderTotal =
-    foundOrder?.totalAmount ??
-    foundOrder?.total ??
-    foundOrder?.subtotal ??
-    calculatedTotal;
+  const orderTotal = foundOrder
+  ? foundOrder.total ??
+    (foundOrder.subtotal + foundOrder.deliveryFee)
+  : calculatedTotal;
 
   return (
     <main className="min-h-screen bg-[#fafafa] text-[#171923]">
@@ -198,7 +201,7 @@ export default function TrackOrderPage() {
             </span>
 
             <span className="text-xl font-black tracking-tight sm:text-2xl">
-              SONAMA<span className="text-[#1769e0]">WILLS</span>
+              SONAMA <span className="text-[#1769e0]"> WILLS</span>
               <span className="mt-0.5 block text-[9px] font-semibold tracking-[0.24em] text-gray-400">
                 ELECTRONICS & HOME
               </span>
@@ -233,35 +236,58 @@ export default function TrackOrderPage() {
           </h1>
 
           <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-gray-500 sm:text-base">
-            Enter your order number below to view your order details
-            and follow its delivery progress.
+            Enter your order number and email address to view your
+            order details and follow its delivery progress.
           </p>
         </div>
 
         {/* Order search card */}
         <div className="mx-auto mt-10 max-w-2xl rounded-[26px] border border-gray-100 bg-white p-5 shadow-sm sm:p-8">
           <form onSubmit={handleTrackOrder}>
-            <label
-              htmlFor="orderNumber"
-              className="mb-3 block text-sm font-bold"
-            >
-              Order number
-            </label>
+            <div className="space-y-5">
+              <div>
+                <label
+                  htmlFor="orderNumber"
+                  className="mb-3 block text-sm font-bold"
+                >
+                  Order number
+                </label>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <div className="flex h-14 flex-1 items-center gap-3 rounded-xl border border-gray-200 px-4 transition focus-within:border-[#1769e0] focus-within:ring-4 focus-within:ring-blue-50">
-                <Search
-                  size={20}
-                  className="shrink-0 text-gray-400"
-                />
+                <div className="flex h-14 items-center gap-3 rounded-xl border border-gray-200 px-4 transition focus-within:border-[#1769e0] focus-within:ring-4 focus-within:ring-blue-50">
+                  <Search
+                    size={20}
+                    className="shrink-0 text-gray-400"
+                  />
+
+                  <input
+                    id="orderNumber"
+                    type="text"
+                    value={orderNumber}
+                    onChange={(event) =>
+                      setOrderNumber(event.target.value)
+                    }
+                    placeholder="e.g. SW-12345678"
+                    className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-gray-400"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="trackingEmail"
+                  className="mb-3 block text-sm font-bold"
+                >
+                  Email address used for the order
+                </label>
 
                 <input
-                  id="orderNumber"
-                  type="text"
-                  value={orderNumber}
-                  onChange={(event) => setOrderNumber(event.target.value)}
-                  placeholder="e.g. SW-12345678"
-                  className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-gray-400"
+                  id="trackingEmail"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="Enter your email address"
+                  className="h-14 w-full rounded-xl border border-gray-200 px-4 text-sm font-medium outline-none transition placeholder:text-gray-400 focus:border-[#1769e0] focus:ring-4 focus:ring-blue-50"
                   required
                 />
               </div>
@@ -269,21 +295,21 @@ export default function TrackOrderPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex h-14 items-center justify-center gap-2 rounded-xl bg-[#1769e0] px-7 text-sm font-bold text-white transition hover:bg-[#1255b9] disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#1769e0] px-7 text-sm font-bold text-white transition hover:bg-[#1255b9] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Track order
-                <ArrowRight size={18} />
+                {loading ? "Finding your order..." : "Track order"}
+                {!loading && <ArrowRight size={18} />}
               </button>
             </div>
 
             <p className="mt-4 text-xs leading-5 text-gray-400">
-              Your order number is the reference provided after placing
-              your order.
+              Use the order reference and email address you provided
+              during checkout.
             </p>
           </form>
         </div>
 
-        {/* Order not found */}
+        {/* Order not found / tracking error */}
         {searched && !foundOrder && (
           <div className="mx-auto mt-6 max-w-2xl rounded-2xl border border-red-100 bg-red-50 p-6 text-center">
             <Package
@@ -292,12 +318,12 @@ export default function TrackOrderPage() {
             />
 
             <h2 className="font-bold text-red-800">
-              Order not found
+              Unable to find your order
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-red-700">
-              We couldn&apos;t find an order matching that number.
-              Check the number and try again.
+              {trackingError ||
+                "We couldn't find an order matching those details. Please check and try again."}
             </p>
           </div>
         )}
@@ -314,16 +340,14 @@ export default function TrackOrderPage() {
                   </p>
 
                   <h2 className="mt-2 text-2xl font-black">
-                    {foundOrder.orderNumber ||
-                      foundOrder.orderId ||
-                      `SW-${foundOrder.id}`}
+                    {foundOrder.orderNumber}
                   </h2>
 
-                  {(foundOrder.createdAt || foundOrder.date) && (
+                  {foundOrder.createdAt && (
                     <p className="mt-2 text-sm text-gray-500">
                       Ordered on{" "}
                       {new Date(
-                        foundOrder.createdAt || foundOrder.date!
+                        foundOrder.createdAt
                       ).toLocaleDateString("en-NG", {
                         day: "numeric",
                         month: "long",
@@ -432,10 +456,7 @@ export default function TrackOrderPage() {
                   <div>
                     <p className="text-xs text-gray-400">Customer</p>
                     <p className="mt-1 font-semibold">
-                      {foundOrder.customerName ||
-                        foundOrder.fullName ||
-                        foundOrder.name ||
-                        "Not provided"}
+                      {foundOrder.customerName || "Not provided"}
                     </p>
                   </div>
 
@@ -454,7 +475,7 @@ export default function TrackOrderPage() {
                     </p>
                     <p className="mt-1 font-semibold leading-6">
                       {[
-                        foundOrder.address || foundOrder.streetAddress,
+                        foundOrder.address,
                         foundOrder.city,
                         foundOrder.state,
                       ]
@@ -492,6 +513,15 @@ export default function TrackOrderPage() {
                         /[_-]/g,
                         " "
                       )}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between gap-3">
+                    <span className="text-gray-500">
+                      Payment status
+                    </span>
+                    <span className="font-semibold capitalize">
+                      {foundOrder.paymentStatus || "Pending"}
                     </span>
                   </div>
 
