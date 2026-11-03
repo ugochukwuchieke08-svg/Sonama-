@@ -55,8 +55,8 @@ const [saving, setSaving] = useState(false);
 const [uploading, setUploading] = useState(false);
 const [error, setError] = useState("");
 const [success, setSuccess] = useState("");
-const [imageFile, setImageFile] = useState<File | null>(null);
-const [imagePreview, setImagePreview] = useState("");
+const [imageFiles, setImageFiles] = useState<File[]>([]);
+const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
 useEffect(() => {
   async function fetchBrands() {
@@ -126,19 +126,14 @@ return () => {
 }, [router, supabase]);
 
 useEffect(() => {
-if (!imageFile) {
-setImagePreview("");
-return;
-}
+  const urls = imageFiles.map((file) => URL.createObjectURL(file));
 
+  setImagePreviews(urls);
 
-const objectUrl = URL.createObjectURL(imageFile);
-setImagePreview(objectUrl);
-
-return () => URL.revokeObjectURL(objectUrl);
-
-
-}, [imageFile]);
+  return () => {
+    urls.forEach((url) => URL.revokeObjectURL(url));
+  };
+}, [imageFiles]);
 
 function updateField<K extends keyof ProductForm>(
 key: K,
@@ -147,49 +142,53 @@ value: ProductForm[K]
 setForm((current) => ({ ...current, [key]: value }));
 }
 
-async function uploadImage(): Promise<string> {
-if (!imageFile) return form.image_url.trim();
+async function uploadImages(): Promise<string[]> {
+  if (imageFiles.length === 0) return [];
 
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-if (!cloudName || !uploadPreset) {
-  throw new Error(
-    "Cloudinary is not configured. Check your .env.local variables."
-  );
-}
-
-setUploading(true);
-
-try {
-  const body = new FormData();
-  body.append("file", imageFile);
-  body.append("upload_preset", uploadPreset);
-  body.append("folder", "sonama-wills/products");
-
-  const response = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-    {
-      method: "POST",
-      body,
-    }
-  );
-
-  const result = await response.json();
-
-  if (!response.ok || !result.secure_url) {
+  if (!cloudName || !uploadPreset) {
     throw new Error(
-      result.error?.message || "Image upload failed. Try another image."
+      "Cloudinary is not configured. Check your .env.local variables."
     );
   }
 
-  return result.secure_url as string;
-} finally {
-  setUploading(false);
-}
+  setUploading(true);
 
+  try {
+    const uploadedUrls = await Promise.all(
+      imageFiles.map(async (file) => {
+        const body = new FormData();
 
+        body.append("file", file);
+        body.append("upload_preset", uploadPreset);
+        body.append("folder", "sonama-wills/products");
+
+        const response = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          {
+            method: "POST",
+            body,
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.secure_url) {
+          throw new Error(
+            result.error?.message || `Failed to upload ${file.name}.`
+          );
+        }
+
+        return result.secure_url as string;
+      })
+    );
+
+    return uploadedUrls;
+  } finally {
+    setUploading(false);
+  }
 }
 
 async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -233,7 +232,10 @@ if (
 setSaving(true);
 
 try {
-  const imageUrl = await uploadImage();
+  const uploadedImages = await uploadImages();
+
+const mainImage = uploadedImages[0] || null;
+const additionalImages = uploadedImages.slice(1);
 
   const slug = form.name
   .trim()
@@ -252,7 +254,8 @@ const { error: insertError } = await supabase.from("products").insert({
   description: form.description.trim(),
   price,
   stock_quantity: stock,
-  image_url: imageUrl || null,
+  image_url: mainImage,
+  image_urls: additionalImages,
   is_active: form.is_active,
   is_featured: form.is_featured,
 });
@@ -467,68 +470,102 @@ Add a product to your store inventory. </p> </div>
       </section>
 
       <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7">
-        <div className="mb-6">
-          <h2 className="font-extrabold">Product Image</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Choose an image to upload to Cloudinary.
-          </p>
-        </div>
+  <div className="mb-6">
+    <h2 className="font-extrabold">Product Images</h2>
+    <p className="mt-1 text-sm text-gray-500">
+      Upload up to 6 images. The first image will be the main product image.
+    </p>
+  </div>
 
-        <label className="flex min-h-48 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-[#fafafa] p-6 text-center transition hover:border-blue-300 hover:bg-blue-50/40">
-          {imagePreview ? (
-            <div className="relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={imagePreview}
-                alt="Product preview"
-                className="h-40 w-40 rounded-xl bg-white object-contain p-2"
-              />
-              <span className="mt-3 block max-w-xs truncate text-xs font-semibold text-gray-500">
-                {imageFile?.name}
-              </span>
-            </div>
-          ) : (
-            <>
-              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-[#1769e0]">
-                <ImagePlus size={27} />
-              </div>
-              <span className="text-sm font-bold">Choose product image</span>
-              <span className="mt-1 text-xs text-gray-500">
-                PNG, JPG or WEBP
-              </span>
-            </>
+  <label className="flex min-h-48 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-[#fafafa] p-6 text-center transition hover:border-blue-300 hover:bg-blue-50/40">
+    <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-[#1769e0]">
+      <ImagePlus size={27} />
+    </div>
+
+    <span className="text-sm font-bold">
+      Choose product images
+    </span>
+
+    <span className="mt-1 text-xs text-gray-500">
+      PNG, JPG or WEBP · Maximum 10MB each
+    </span>
+
+    <span className="mt-2 text-xs font-semibold text-[#1769e0]">
+      {imageFiles.length}/6 images selected
+    </span>
+
+    <input
+      type="file"
+      accept="image/png,image/jpeg,image/webp"
+      multiple
+      className="sr-only"
+      onChange={(e) => {
+        const files = Array.from(e.target.files ?? []);
+
+        if (files.length > 6) {
+          setError("You can upload a maximum of 6 images.");
+          e.target.value = "";
+          return;
+        }
+
+        const oversizedFile = files.find(
+          (file) => file.size > 10 * 1024 * 1024
+        );
+
+        if (oversizedFile) {
+          setError(`${oversizedFile.name} is larger than 10MB.`);
+          e.target.value = "";
+          return;
+        }
+
+        setError("");
+        setImageFiles(files);
+        e.target.value = "";
+      }}
+    />
+  </label>
+
+  {imagePreviews.length > 0 && (
+    <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+      {imagePreviews.map((preview, index) => (
+        <div
+          key={`${preview}-${index}`}
+          className="relative rounded-xl border border-gray-200 bg-gray-50 p-2"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={preview}
+            alt={`Product preview ${index + 1}`}
+            className="h-36 w-full rounded-lg bg-white object-contain"
+          />
+
+          {index === 0 && (
+            <span className="absolute left-3 top-3 rounded-md bg-[#1769e0] px-2 py-1 text-[10px] font-bold text-white">
+              MAIN IMAGE
+            </span>
           )}
 
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            className="sr-only"
-            onChange={(e) => {
-              const file = e.target.files?.[0] ?? null;
-
-              if (file && file.size > 10 * 1024 * 1024) {
-                setError("Choose an image smaller than 10MB.");
-                e.target.value = "";
-                return;
-              }
-
-              setError("");
-              setImageFile(file);
-            }}
-          />
-        </label>
-
-        {imageFile && (
           <button
             type="button"
-            onClick={() => setImageFile(null)}
-            className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-red-600 hover:text-red-700"
+            onClick={() => {
+              setImageFiles((current) =>
+                current.filter((_, i) => i !== index)
+              );
+            }}
+            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-white text-red-600 shadow-sm transition hover:bg-red-50"
+            aria-label={`Remove image ${index + 1}`}
           >
             <X size={15} />
-            Remove image
           </button>
-        )}
-      </section>
+
+          <p className="mt-2 truncate text-xs font-medium text-gray-500">
+            {imageFiles[index]?.name}
+          </p>
+        </div>
+      ))}
+    </div>
+  )}
+</section>
 
       <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7">
         <h2 className="mb-5 font-extrabold">Visibility & Promotion</h2>

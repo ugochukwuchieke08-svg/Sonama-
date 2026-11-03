@@ -1,0 +1,53 @@
+[
+  {
+    "name": "Maxi",
+    "categories": [
+      "Kitchen/Home Appliances",
+      "Televisions",
+      "Solar & Power Solutions",
+      "Air Conditioners"
+    ]
+  },
+  {
+    "name": "LG",
+    "categories": [
+      "Televisions",
+      "Audio",
+      "Computers & Accessories",
+      "Washing Machines",
+      "Air Conditioners",
+      "Refrigerators",
+      "Kitchen/Home Appliances"
+    ]
+  },
+  {
+    "name": "Hisense",
+    "categories": [
+      "Audio",
+      "Washing Machines",
+      "Air Conditioners",
+      "Refrigerators",
+      "Televisions",
+      "Kitchen/Home Appliances",
+      "Freezers"
+    ]
+  },
+  {
+    "name": "Deye",
+    "categories": [
+      "Solar & Power Solutions"
+    ]
+  },
+  {
+    "name": "Actiu",
+    "categories": [
+      "Office Furniture"
+    ]
+  },
+  {
+    "name": "Growatt",
+    "categories": [
+      "Solar & Power Solutions"
+    ]
+  }
+]

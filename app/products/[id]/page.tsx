@@ -36,6 +36,7 @@ type Product = {
   price: number;
   stock_quantity: number;
   image_url: string | null;
+  image_urls: string[];
   is_active: boolean;
   is_featured: boolean;
   description?: string | null;
@@ -67,6 +68,12 @@ function formatProduct(data: any): Product {
     price: Number(data.price ?? 0),
     stock_quantity: Number(data.stock_quantity ?? 0),
     image_url: data.image_url || FALLBACK_IMAGE,
+image_urls: Array.isArray(data.image_urls)
+  ? data.image_urls.filter(
+      (url: unknown): url is string =>
+        typeof url === "string" && url.trim().length > 0
+    )
+  : [],
     is_active: Boolean(data.is_active),
     is_featured: Boolean(data.is_featured),
     description: data.description ?? null,
@@ -90,6 +97,9 @@ function ProductDetailsContent() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -139,7 +149,8 @@ function ProductDetailsContent() {
       }
 
       const selectedProduct = formatProduct(data);
-      setProduct(selectedProduct);
+        setProduct(selectedProduct);
+        setActiveImageIndex(0);
 
       const {
         data: relatedData,
@@ -305,6 +316,52 @@ function ProductDetailsContent() {
     );
   }
 
+  const productImages = [
+  product.image_url || FALLBACK_IMAGE,
+  ...product.image_urls.filter(
+    (url) => url !== product.image_url
+  ),
+];
+
+const activeImage =
+  productImages[activeImageIndex] || FALLBACK_IMAGE;
+
+const showPreviousImage = () => {
+  setActiveImageIndex((current) =>
+    current === 0 ? productImages.length - 1 : current - 1
+  );
+};
+
+const showNextImage = () => {
+  setActiveImageIndex((current) =>
+    current === productImages.length - 1 ? 0 : current + 1
+  );
+};
+
+const handleGalleryTouchStart = (
+  event: React.TouchEvent<HTMLDivElement>
+) => {
+  setTouchStartX(event.touches[0].clientX);
+};
+
+const handleGalleryTouchEnd = (
+  event: React.TouchEvent<HTMLDivElement>
+) => {
+  if (touchStartX === null) return;
+
+  const difference = event.changedTouches[0].clientX - touchStartX;
+
+  if (Math.abs(difference) > 50) {
+    if (difference < 0) {
+      showNextImage();
+    } else {
+      showPreviousImage();
+    }
+  }
+
+  setTouchStartX(null);
+};
+
   const inStock = product.stock_quantity > 0;
 
   const features =
@@ -384,39 +441,106 @@ function ProductDetailsContent() {
       {/* Product details */}
       <section className="mx-auto max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 sm:pb-24 lg:px-12">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
-          {/* Product image */}
-          <div className="relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-[26px] border border-gray-100 bg-white p-8 sm:min-h-[480px] sm:p-12">
-            <span
-              className={`absolute left-5 top-5 rounded-full px-4 py-2 text-[10px] font-black tracking-[0.15em] ${
-                !inStock
-                  ? "bg-red-50 text-red-600"
-                  : product.is_featured
-                    ? "bg-blue-50 text-[#1769e0]"
-                    : "bg-green-50 text-green-700"
-              }`}
-            >
-              {!inStock
-                ? "OUT OF STOCK"
-                : product.is_featured
-                  ? "FEATURED"
-                  : "AVAILABLE"}
-            </span>
+         {/* Product Image Gallery */}
+<div className="space-y-4">
+  <div
+    className="relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-[26px] border border-gray-100 bg-white p-8 sm:min-h-[480px] sm:p-12"
+    onTouchStart={handleGalleryTouchStart}
+    onTouchEnd={handleGalleryTouchEnd}
+  >
+    <span
+      className={`absolute left-5 top-5 z-10 rounded-full px-4 py-2 text-[10px] font-black tracking-[0.15em] ${
+        !inStock
+          ? "bg-red-50 text-red-600"
+          : product.is_featured
+            ? "bg-blue-50 text-[#1769e0]"
+            : "bg-green-50 text-green-700"
+      }`}
+    >
+      {!inStock
+        ? "OUT OF STOCK"
+        : product.is_featured
+          ? "FEATURED"
+          : "AVAILABLE"}
+    </span>
 
-            <img
-              src={product.image_url || FALLBACK_IMAGE}
-              alt={product.name}
-              className="max-h-[420px] w-full object-contain"
-              onError={(event) => {
-                event.currentTarget.onerror = null;
-                event.currentTarget.src = FALLBACK_IMAGE;
-              }}
-            />
+    {/* Main image */}
+    <img
+      key={activeImage}
+      src={activeImage}
+      alt={`${product.name} - Image ${activeImageIndex + 1}`}
+      className="max-h-[420px] w-full object-contain"
+      onError={(event) => {
+        event.currentTarget.onerror = null;
+        event.currentTarget.src = FALLBACK_IMAGE;
+      }}
+    />
 
-            <div className="absolute bottom-5 left-5 flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-600">
-              <ShieldCheck size={16} className="text-[#1769e0]" />
-              Quality-focused selection
-            </div>
-          </div>
+    {/* Previous image */}
+    {productImages.length > 1 && (
+      <>
+        <button
+          type="button"
+          onClick={showPreviousImage}
+          aria-label="Previous product image"
+          className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-100 bg-white/90 text-gray-800 shadow-md transition hover:bg-[#1769e0] hover:text-white"
+        >
+          <ArrowLeft size={18} />
+        </button>
+
+        {/* Next image */}
+        <button
+          type="button"
+          onClick={showNextImage}
+          aria-label="Next product image"
+          className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-100 bg-white/90 text-gray-800 shadow-md transition hover:bg-[#1769e0] hover:text-white"
+        >
+          <ArrowRight size={18} />
+        </button>
+
+        {/* Image counter */}
+        <span className="absolute right-5 top-5 rounded-full bg-black/60 px-3 py-1.5 text-xs font-bold text-white">
+          {activeImageIndex + 1}/{productImages.length}
+        </span>
+      </>
+    )}
+
+    <div className="absolute bottom-5 left-5 flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-600">
+      <ShieldCheck size={16} className="text-[#1769e0]" />
+      Quality-focused selection
+    </div>
+  </div>
+
+  {/* Image thumbnails */}
+  {productImages.length > 1 && (
+    <div className="flex gap-3 overflow-x-auto pb-2">
+      {productImages.map((image, index) => (
+        <button
+          key={`${image}-${index}`}
+          type="button"
+          onClick={() => setActiveImageIndex(index)}
+          aria-label={`View product image ${index + 1}`}
+          aria-pressed={activeImageIndex === index}
+          className={`h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 bg-white p-2 transition sm:h-24 sm:w-24 ${
+            activeImageIndex === index
+              ? "border-[#1769e0] shadow-md"
+              : "border-gray-100 hover:border-blue-200"
+          }`}
+        >
+          <img
+            src={image}
+            alt={`${product.name} thumbnail ${index + 1}`}
+            className="h-full w-full object-contain"
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = FALLBACK_IMAGE;
+            }}
+          />
+        </button>
+      ))}
+    </div>
+  )}
+</div>
 
           {/* Product information */}
           <div className="flex flex-col justify-center py-2">

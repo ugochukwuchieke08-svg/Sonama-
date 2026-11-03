@@ -362,13 +362,17 @@ useEffect(() => {
     [filteredProducts]
   );
 
-  const displayedProducts =
-    featuredProducts.length > 0 &&
-    !search &&
-    activeCategory === "All Products" &&
-    activeBrand === "All Brands"
-      ? featuredProducts.slice(0, 8)
-      : filteredProducts.slice(0, 8);
+ const displayedProducts = useMemo(() => {
+  const featured = filteredProducts.filter(
+    (product) => product.is_featured
+  );
+
+  const others = filteredProducts.filter(
+    (product) => !product.is_featured
+  );
+
+  return [...featured, ...others].slice(0, 16);
+}, [filteredProducts]);
 
   const cartCount = getCartCount(cart);
 
@@ -763,7 +767,15 @@ useEffect(() => {
             .filter((category) => category.name !== "All Products")
             .map((category) => {
               const Icon = category.icon;
-              const image = categoryImages[category.name] || FALLBACK_IMAGE;
+              const image =
+              categoryImages[category.name] ||
+              products.find(
+                (product) =>
+                  product.category?.trim() === category.name &&
+                  product.image_url &&
+                  product.image_url !== FALLBACK_IMAGE
+              )?.image_url ||
+              FALLBACK_IMAGE;
 
               const count = products.filter(
                 (product) => product.category === category.name
@@ -1027,7 +1039,7 @@ useEffect(() => {
 
           {/* Loading skeletons */}
           {productsLoading && !productsError && (
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
               {[1, 2, 3, 4].map((item) => (
                 <div
                   key={item}
@@ -1146,20 +1158,20 @@ useEffect(() => {
               )}
 
               {/* View all products */}
-              {filteredProducts.length > displayedProducts.length && (
-                <div className="mt-10 flex justify-center">
-                  <button
-                    onClick={() => router.push("/products")}
-                    className="group inline-flex items-center gap-3 rounded-md bg-[#1769e0] px-8 py-4 text-sm font-bold text-white transition duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-lg"
-                  >
-                    View All Products
-                    <ArrowRight
-                      size={18}
-                      className="transition group-hover:translate-x-1"
-                    />
-                  </button>
-                </div>
-              )}
+              {filteredProducts.length > 0 && (
+  <div className="mt-10 flex justify-center">
+    <button
+      onClick={() => router.push("/products")}
+      className="group inline-flex items-center gap-3 rounded-md bg-[#1769e0] px-8 py-4 text-sm font-bold text-white transition duration-300 hover:-translate-y-1 hover:bg-blue-700 hover:shadow-lg"
+    >
+      See All Products
+      <ArrowRight
+        size={18}
+        className="transition group-hover:translate-x-1"
+      />
+    </button>
+  </div>
+)}
             </>
           )}
         </div>
