@@ -51,6 +51,7 @@ useState<PaymentMethod>("cod");
 const [isSubmitting, setIsSubmitting] = useState(false);
 const [orderNumber, setOrderNumber] = useState("");
 const [orderTotal, setOrderTotal] = useState(0);
+const [orderPaymentMethod, setOrderPaymentMethod] = useState<"cod" | "online">("cod");
 const [error, setError] = useState("");
 
 const [form, setForm] = useState({
@@ -145,6 +146,34 @@ total + Number(product.price) * product.quantity,
 0
 );
 
+// Handle the customer returning from Flutterwave.
+useEffect(() => {
+  if (!cartLoaded || productsLoading) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const payment = params.get("payment");
+  const returnedOrderNumber = params.get("orderNumber");
+
+  if (payment === "success" && returnedOrderNumber) {
+    setOrderNumber(returnedOrderNumber);
+    setOrderTotal(subtotal);
+    setOrderPaymentMethod("online");
+
+    // Payment has been verified by the server.
+    clearCart();
+
+    window.history.replaceState({}, "", "/checkout");
+  }
+
+  if (payment === "failed") {
+    setError(
+      "Your payment could not be confirmed. Your cart is still available. You can try again or select Cash on Delivery."
+    );
+
+    window.history.replaceState({}, "", "/checkout");
+  }
+}, [cartLoaded, productsLoading]);
+
 const unavailableItems = cart.filter(
 (cartItem) =>
 !products.some((product) => product.id === cartItem.id)
@@ -197,11 +226,6 @@ const placeOrder = async (event: FormEvent<HTMLFormElement>) => {
     return;
   }
 
-  if (paymentMethod !== "cod") {
-    setError("Online payment is not available yet. Please select Cash on Delivery.");
-    return;
-  }
-
   setIsSubmitting(true);
 
   try {
@@ -226,10 +250,22 @@ const placeOrder = async (event: FormEvent<HTMLFormElement>) => {
       throw new Error(result.error || "Unable to place your order.");
     }
 
-    setOrderTotal(result.total);
-    setOrderNumber(result.orderNumber);
+    // Redirect customers to Flutterwave.
+if (result.paymentMethod === "flutterwave") {
+  if (!result.checkoutUrl) {
+    throw new Error("Unable to generate payment link. Please try again.");
+  }
 
-    clearCart();
+  window.location.assign(result.checkoutUrl);
+  return;
+}
+
+// Cash on Delivery.
+setOrderTotal(result.total);
+setOrderNumber(result.orderNumber);
+setOrderPaymentMethod("cod");
+
+clearCart();
 
   } catch (error) {
     console.error("Checkout error:", error);
@@ -271,8 +307,10 @@ return (
       </h1>
 
       <p className="mt-4 text-sm leading-7 text-gray-500">
-        Your order has been successfully saved. Our team will contact you to confirm your order and delivery details.
-      </p>
+          {orderPaymentMethod === "online"
+            ? "Your online payment has been verified successfully. Your order is now awaiting processing by our team."
+            : "Your order has been successfully saved. Our team will contact you to confirm your order and delivery details."}
+        </p>
 
       <div className="mt-8 rounded-2xl bg-gray-50 p-5 text-left">
         <p className="text-xs font-semibold text-gray-500">
@@ -294,7 +332,7 @@ return (
         </div>
 
         <p className="mt-3 text-xs text-gray-500">
-          Payment method: Cash on Delivery
+          Payment method: {orderPaymentMethod === "online" ? "Flutterwave (Paid)" : "Cash on Delivery"}
         </p>
       </div>
 
@@ -590,9 +628,9 @@ SONAMA<span className="text-[#1769e0]">WILLS</span>
                 <div>
                   <p className="font-bold">Online Payment</p>
 
-                  <p className="mt-1 text-xs leading-5 text-gray-500">
-                    Preview only. A real payment gateway is not connected.
-                  </p>
+                    <p className="mt-1 text-xs leading-5 text-gray-500">
+                      Pay securely online using Flutterwave.
+                    </p>
                 </div>
               </label>
             </div>
@@ -753,7 +791,13 @@ SONAMA<span className="text-[#1769e0]">WILLS</span>
             }
             className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#1769e0] px-5 py-4 text-sm font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isSubmitting ? "Placing order..." : "Place Order"}
+            {isSubmitting
+              ? paymentMethod === "online"
+                ? "Redirecting to payment..."
+                : "Placing order..."
+              : paymentMethod === "online"
+                ? "Proceed to Payment"
+                : "Place Order"}
 
             {!isSubmitting && <ArrowRight size={18} />}
           </button>
