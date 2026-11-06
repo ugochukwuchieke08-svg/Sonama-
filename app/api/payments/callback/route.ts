@@ -15,7 +15,7 @@ function redirectToCheckout(
   status: "success" | "failed",
   orderNumber?: string
 ) {
-  const url = new URL("/checkout", siteUrl);
+  const url = new URL("/checkout", siteUrl!);
 
   url.searchParams.set("payment", status);
 
@@ -44,11 +44,10 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
 
-    const status = searchParams.get("status");
     const txRef = searchParams.get("tx_ref");
     const transactionId = searchParams.get("transaction_id");
 
-    if (!txRef) {
+    if (!txRef || !transactionId || !/^\d+$/.test(transactionId)) {
       return redirectToCheckout("failed");
     }
 
@@ -63,24 +62,24 @@ export async function GET(request: Request) {
       }
     );
 
-    // Find the order using our unique payment reference.
+    // Find the original order.
 
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .select(
-        "id, order_number, subtotal, delivery_fee, total_amount, payment_method, payment_status, payment_reference"
+        "id, order_number, total_amount, payment_method, payment_status, payment_reference"
       )
       .eq("payment_reference", txRef)
       .eq("payment_method", "flutterwave")
       .maybeSingle();
 
     if (orderError || !order) {
-      console.error("Payment order lookup error:", orderError);
+      console.error("Payment order lookup failed:", orderError);
 
       return redirectToCheckout("failed");
     }
 
-    // Do not process an order that has already been paid.
+    // Already-paid orders must never be processed again.
 
     if (order.payment_status === "paid") {
       return redirectToCheckout(
@@ -89,36 +88,8 @@ export async function GET(request: Request) {
       );
     }
 
-    // Handle cancelled or unsuccessful payment attempts.
-
-    if (status !== "successful" || !transactionId) {
-      if (
-        status === "cancelled" ||
-        status === "failed"
-      ) {
-        await supabase
-          .from("orders")
-          .update({ payment_status: "failed" })
-          .eq("id", order.id)
-          .eq("payment_status", "pending");
-      }
-
-      return redirectToCheckout(
-        "failed",
-        order.order_number
-      );
-    }
-
-    // Validate transaction ID.
-
-    if (!/^\d+$/.test(transactionId)) {
-      return redirectToCheckout(
-        "failed",
-        order.order_number
-      );
-    }
-
     // Verify directly with Flutterwave.
+    // Never trust the browser callback alone.
 
     const verificationResponse = await fetch(
       `https://api.flutterwave.com/v3/transactions/${transactionId}/verify`,
@@ -129,20 +100,30 @@ export async function GET(request: Request) {
           Accept: "application/json",
         },
         cache: "no-store",
+        signal: AbortSignal.timeout(15000),
       }
     );
 
-    const verificationData =
-      await verificationResponse.json();
+    if (!verificationResponse.ok) {
+      console.error(
+        "Flutterwave verification HTTP error:",
+        verificationResponse.status
+      );
+
+      return redirectToCheckout(
+        "failed",
+        order.order_number
+      );
+    }
+
+    const verificationData = await verificationResponse.json();
 
     if (
-      !verificationResponse.ok ||
       verificationData.status !== "success" ||
       !verificationData.data
     ) {
       console.error(
-        "Flutterwave verification error:",
-        verificationData
+        "Flutterwave transaction verification failed."
       );
 
       return redirectToCheckout(
@@ -153,27 +134,30 @@ export async function GET(request: Request) {
 
     const transaction = verificationData.data;
 
+    // Validate the verified transaction.
+
     const expectedAmount = Number(order.total_amount);
     const paidAmount = Number(transaction.amount);
 
-    // Verify every important transaction detail.
-
     const isVerified =
+      String(transaction.id) === transactionId &&
       transaction.status === "successful" &&
       transaction.tx_ref === order.payment_reference &&
       transaction.currency === "NGN" &&
-      Number.isFinite(paidAmount) &&
       Number.isFinite(expectedAmount) &&
+      Number.isFinite(paidAmount) &&
+      expectedAmount > 0 &&
       paidAmount >= expectedAmount;
 
     if (!isVerified) {
       console.error("Payment verification mismatch:", {
         orderNumber: order.order_number,
+        transactionId: transaction.id,
         transactionStatus: transaction.status,
         transactionReference: transaction.tx_ref,
         expectedReference: order.payment_reference,
-        paidAmount,
         expectedAmount,
+        paidAmount,
         currency: transaction.currency,
       });
 
@@ -183,8 +167,19 @@ export async function GET(request: Request) {
       );
     }
 
-    // Mark the order as paid.
-    // Keep the fulfillment status pending for admin processing.
+    // Log overpayments for reconciliation.
+
+    if (paidAmount > expectedAmount) {
+      console.warn("Flutterwave overpayment detected:", {
+        orderNumber: order.order_number,
+        expectedAmount,
+        paidAmount,
+        difference: paidAmount - expectedAmount,
+      });
+    }
+
+    // Atomically mark the order as paid.
+    // Only pending orders can be updated.
 
     const { data: updatedOrder, error: updateError } =
       await supabase
@@ -198,23 +193,31 @@ export async function GET(request: Request) {
         .maybeSingle();
 
     if (updateError) {
-      console.error("Order payment update error:", updateError);
+      console.error(
+        "Order payment update failed:",
+        updateError
+      );
 
       return NextResponse.json(
-        { error: "Payment was verified but order update failed." },
+        { error: "Payment verified but order update failed." },
         { status: 500 }
       );
     }
 
-    if (!updatedOrder) {
-      // Another callback may already have processed the payment.
-      const { data: latestOrder } = await supabase
-        .from("orders")
-        .select("payment_status")
-        .eq("id", order.id)
-        .single();
+    // Handle simultaneous callbacks safely.
 
-      if (latestOrder?.payment_status !== "paid") {
+    if (!updatedOrder) {
+      const { data: latestOrder, error: latestError } =
+        await supabase
+          .from("orders")
+          .select("payment_status")
+          .eq("id", order.id)
+          .maybeSingle();
+
+      if (
+        latestError ||
+        latestOrder?.payment_status !== "paid"
+      ) {
         return NextResponse.json(
           { error: "Unable to confirm payment status." },
           { status: 500 }
@@ -228,7 +231,7 @@ export async function GET(request: Request) {
     );
 
   } catch (error) {
-    console.error("Payment callback error:", error);
+    console.error("Flutterwave callback error:", error);
 
     return NextResponse.json(
       { error: "Unable to process payment verification." },
