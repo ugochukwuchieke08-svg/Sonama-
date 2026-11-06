@@ -415,15 +415,15 @@ useEffect(() => {
       {/* Header */}
       <header className="sticky top-0 z-[100] border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1500px] items-center gap-2 px-3 py-3 sm:gap-5 sm:px-8 sm:py-4 lg:px-12">
-          <a href="/" className="shrink-0 transition-transform duration-300 hover:scale-[1.02]">
-            <span className="block whitespace-nowrap text-[15px] font-black tracking-tight sm:text-2xl">
-              SONAMA WILLS
-              <span className="text-[#1769e0]"> STORE</span>
-            </span>
-
-            <span className="mt-0.5 block text-[7px] font-bold tracking-[0.2em] text-gray-400 sm:text-[8px] sm:tracking-[0.3em]">
-              ELECTRONICS & HOME
-            </span>
+          <a
+            href="/"
+            className="shrink-0 transition-transform duration-300 hover:scale-[1.02]"
+          >
+            <img
+              src="/images/logo3.png"
+              alt="SONAMA WILLS - Home of All Appliances"
+              className="h-16 w-auto max-w-[220px] object-contain sm:h-20 sm:max-w-[280px]"
+            />
           </a>
 
           {/* Desktop search */}
@@ -1245,7 +1245,7 @@ useEffect(() => {
                   <div className="relative flex min-h-[370px] max-w-2xl flex-col items-start justify-center px-7 py-10 sm:min-h-[430px] sm:px-12 sm:py-14">
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.2em] text-white backdrop-blur-md sm:text-[10px]">
-                        SONAMA WILLS EXCLUSIVE
+                         EXCLUSIVE
                       </span>
 
                       {promotion.discount_label && (
@@ -1365,16 +1365,16 @@ useEffect(() => {
       <footer id="contact" className="scroll-mt-24 bg-[#0d1d32] text-white">
         <div className="mx-auto grid max-w-[1500px] gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 lg:grid-cols-4 lg:px-12 lg:py-16">
           <div>
-            <a href="/" className="inline-block transition hover:opacity-80">
-              <span className="text-xl font-black tracking-tight">
-                SONAMA WILLS
-                <span className="text-[#70b2ff]"> STORE</span>
-              </span>
-
-              <span className="mt-1 block text-[8px] font-bold tracking-[0.3em] text-gray-500">
-                ELECTRONICS & HOME
-              </span>
-            </a>
+           <a
+  href="/"
+  className="shrink-0 transition-transform duration-300 hover:scale-[1.02]"
+>
+  <img
+    src="/images/logo3.png"
+    alt="SONAMA WILLS - Home of All Appliances"
+    className="h-12 w-auto max-w-[155px] object-contain sm:h-14 sm:max-w-[210px]"
+  />
+</a>
 
             <p className="mt-5 max-w-xs text-sm leading-7 text-gray-400">
               Your destination for electronics and home appliances.

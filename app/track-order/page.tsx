@@ -193,31 +193,30 @@ export default function TrackOrderPage() {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md">
-        <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-5 px-5 sm:px-8 lg:px-12">
-          <Link href="/" className="flex shrink-0 items-center gap-2.5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1769e0] text-white shadow-lg shadow-blue-100">
-              <Zap size={23} fill="white" />
-            </span>
+<header className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-md">
+  <div className="mx-auto flex h-[100px] max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-8 lg:px-12">
 
-            <span className="text-xl font-black tracking-tight sm:text-2xl">
-              SONAMA <span className="text-[#1769e0]"> WILLS</span>
-              <span className="mt-0.5 block text-[9px] font-semibold tracking-[0.24em] text-gray-400">
-                ELECTRONICS & HOME
-              </span>
-            </span>
-          </Link>
+    {/* SONAMA WILLS Logo */}
+    <Link href="/" className="flex shrink-0 items-center">
+      <img
+        src="/images/logo3.png"
+        alt="SONAMA WILLS - Home of All Appliances"
+        className="h-20 w-auto max-w-[260px] object-contain sm:h-24 sm:max-w-[320px]"
+      />
+    </Link>
 
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-[#1769e0]"
-          >
-            <ArrowLeft size={17} />
-            <span className="hidden sm:inline">Continue shopping</span>
-            <span className="sm:hidden">Shop</span>
-          </Link>
-        </div>
-      </header>
+    {/* Continue Shopping */}
+    <Link
+      href="/"
+      className="flex shrink-0 items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-[#1769e0]"
+    >
+      <ArrowLeft size={17} />
+      <span className="hidden sm:inline">Continue shopping</span>
+      <span className="sm:hidden">Shop</span>
+    </Link>
+
+  </div>
+</header>
 
       {/* Main content */}
       <section className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 md:py-16 lg:px-12">

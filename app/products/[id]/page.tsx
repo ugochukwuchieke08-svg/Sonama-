@@ -381,63 +381,42 @@ const handleGalleryTouchEnd = (
         Quality home appliances. Shopping made simple.
       </div>
 
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur-md">
-        <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
-          <button
-            onClick={() => router.push("/")}
-            className="flex items-center gap-2.5"
-            aria-label="Return to homepage"
-          >
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1769e0] text-sm font-black text-white shadow-lg shadow-blue-100">
-              SW
-            </span>
+     {/* Header */}
+<header className="sticky top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur-md">
+  <div className="mx-auto flex h-[68px] max-w-[1440px] items-center justify-between gap-4 px-3 sm:h-[84px] sm:px-8 lg:px-12">
 
-            <span className="text-lg font-black tracking-tight sm:text-2xl">
-              SONAMA<span className="text-[#1769e0]">WILLS</span>
+    {/* SONAMA WILLS Logo */}
+    <button
+      onClick={() => router.push("/")}
+      className="shrink-0 transition-transform duration-300 hover:scale-[1.02]"
+      aria-label="Return to homepage"
+    >
+      <img
+        src="/images/logo3.png"
+        alt="SONAMA WILLS - Home of All Appliances"
+        className="h-14 w-auto max-w-[200px] object-contain sm:h-20 sm:max-w-[280px]"
+      />
+    </button>
 
-              <span className="mt-0.5 block text-[9px] font-semibold tracking-[0.24em] text-gray-400">
-                ELECTRONICS & HOME
-              </span>
-            </span>
-          </button>
+    {/* Shopping Cart */}
+    <button
+      onClick={() => setCartOpen(true)}
+      aria-label="Open shopping cart"
+      className="relative flex h-10 items-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-bold transition hover:border-blue-200 hover:bg-blue-50 sm:h-11 sm:px-4"
+    >
+      <ShoppingCart size={19} />
 
-          <button
-            onClick={() => setCartOpen(true)}
-            aria-label="Open shopping cart"
-            className="relative flex items-center gap-2 rounded-full bg-gray-100 px-4 py-3 text-sm font-bold transition hover:bg-blue-50"
-          >
-            <ShoppingCart size={18} />
+      <span className="hidden sm:inline">Cart</span>
 
-            <span className="hidden sm:inline">Cart</span>
+      {totalCartQuantity > 0 && (
+        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#1769e0] px-1 text-[10px] text-white">
+          {totalCartQuantity}
+        </span>
+      )}
+    </button>
 
-            {totalCartQuantity > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#1769e0] px-1 text-[10px] text-white">
-                {totalCartQuantity}
-              </span>
-            )}
-          </button>
-        </div>
-      </header>
-
-      {/* Breadcrumb */}
-      <div className="mx-auto max-w-[1440px] px-5 pt-6 sm:px-8 lg:px-12">
-        <button
-          onClick={() => router.push("/products")}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition hover:text-[#1769e0]"
-        >
-          <ArrowLeft size={17} />
-          Back to Shop
-        </button>
-
-        <p className="mt-4 text-xs font-medium text-gray-400">
-          Home <span className="mx-2">/</span>
-          {product.category}
-          <span className="mx-2">/</span>
-          <span className="text-gray-700">{product.name}</span>
-        </p>
-      </div>
-
+  </div>
+</header>
       {/* Product details */}
       <section className="mx-auto max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 sm:pb-24 lg:px-12">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">

@@ -241,65 +241,26 @@ return (
 QUALITY ELECTRONICS. EXCEPTIONAL VALUE.   FREE DELIVERY ON
 SELECTED ORDERS
 </div>
+{/* Header */}
+<header className="sticky top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur-xl">
+  <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-3 sm:gap-5 sm:px-8 sm:py-4">
 
-  {/* Header */}
-  <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur-xl">
-    <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
-      <button
-        onClick={() => router.push("/")}
-        className="shrink-0 text-left text-lg font-black tracking-tight sm:text-2xl"
-      >
-        SONAMA<span className="text-[#1769e0]">WILLS</span>
-        <span className="mt-0.5 block text-[9px] font-semibold tracking-[0.25em] text-gray-400">
-          ELECTRONICS & HOME
-        </span>
-      </button>
+    {/* SONAMA WILLS Logo */}
+    <button
+      onClick={() => router.push("/")}
+      className="shrink-0 text-left transition-transform duration-300 hover:scale-[1.02]"
+      aria-label="Return to homepage"
+    >
+      <img
+        src="/images/logo3.png"
+        alt="SONAMA WILLS - Home of All Appliances"
+        className="h-14 w-auto max-w-[190px] object-contain sm:h-20 sm:max-w-[280px]"
+      />
+    </button>
 
-      {/* Desktop search */}
-      <div className="hidden flex-1 justify-center md:flex">
-        <div className="relative w-full max-w-md">
-          <Search
-            size={17}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-
-          <input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search products..."
-            className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-[#1769e0] focus:bg-white"
-          />
-        </div>
-      </div>
-
-      <div className="flex shrink-0 items-center gap-3">
-        <button
-          onClick={() => router.push("/")}
-          className="hidden items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-[#1769e0] sm:flex"
-        >
-          <ArrowLeft size={16} />
-          Home
-        </button>
-
-        <button
-          onClick={() => setCartOpen(true)}
-          aria-label="Open shopping cart"
-          className="relative flex h-11 w-11 items-center justify-center rounded-full bg-[#1769e0] text-white transition hover:bg-blue-700"
-        >
-          <ShoppingCart size={19} />
-
-          {cartCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#e87928] px-1 text-[10px] font-black text-white">
-              {cartCount}
-            </span>
-          )}
-        </button>
-      </div>
-    </div>
-
-    {/* Mobile search */}
-    <div className="px-5 pb-4 md:hidden">
-      <div className="relative">
+    {/* Desktop search */}
+    <div className="hidden flex-1 justify-center md:flex">
+      <div className="relative w-full max-w-md">
         <Search
           size={17}
           className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -309,11 +270,55 @@ SELECTED ORDERS
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search products..."
-          className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none focus:border-[#1769e0]"
+          className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-[#1769e0] focus:bg-white"
         />
       </div>
     </div>
-  </header>
+
+    {/* Navigation and cart */}
+    <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+
+      <button
+        onClick={() => router.push("/")}
+        className="hidden items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-[#1769e0] sm:flex"
+      >
+        <ArrowLeft size={16} />
+        Home
+      </button>
+
+      <button
+        onClick={() => setCartOpen(true)}
+        aria-label="Open shopping cart"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[#1769e0] text-white transition hover:bg-blue-700 sm:h-11 sm:w-11"
+      >
+        <ShoppingCart size={19} />
+
+        {cartCount > 0 && (
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#e87928] px-1 text-[10px] font-black text-white">
+            {cartCount}
+          </span>
+        )}
+      </button>
+    </div>
+  </div>
+
+  {/* Mobile search */}
+  <div className="px-3 pb-3 sm:px-8 sm:pb-4 md:hidden">
+    <div className="relative">
+      <Search
+        size={17}
+        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+      />
+
+      <input
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        placeholder="Search products..."
+        className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none focus:border-[#1769e0]"
+      />
+    </div>
+  </div>
+</header>
 
   {/* Hero */}
   <section className="relative overflow-hidden bg-[#142d4e]">
