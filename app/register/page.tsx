@@ -1,25 +1,28 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function RegisterPage() {
   const supabase = createClient();
   const router = useRouter();
 
-  const searchParams = useSearchParams();
-  const requestedRedirect = searchParams.get("redirect");
+  const [redirectTo, setRedirectTo] = useState("/account");
 
-  const redirectTo =
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const requestedRedirect = params.get("redirect");
+
+  if (
     requestedRedirect?.startsWith("/") &&
     !requestedRedirect.startsWith("//") &&
     !requestedRedirect.startsWith("/\\")
-      ? requestedRedirect
-      : "/account";
-
+  ) {
+    setRedirectTo(requestedRedirect);
+  }
+}, []);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
