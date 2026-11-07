@@ -1361,92 +1361,124 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer id="contact" className="scroll-mt-24 bg-[#0d1d32] text-white">
-        <div className="mx-auto grid max-w-[1500px] gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 lg:grid-cols-4 lg:px-12 lg:py-16">
-          <div>
-           <a
-  href="/"
-  className="shrink-0 transition-transform duration-300 hover:scale-[1.02]"
->
-  <img
-    src="/images/logo3.png"
-    alt="SONAMA WILLS - Home of All Appliances"
-    className="h-12 w-auto max-w-[155px] object-contain sm:h-14 sm:max-w-[210px]"
-  />
-</a>
+     {/* Footer */}
+<footer id="contact" className="scroll-mt-24 bg-[#0d1d32] text-white">
+  <div className="mx-auto grid max-w-[1500px] gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 lg:grid-cols-4 lg:px-12 lg:py-16">
 
-            <p className="mt-5 max-w-xs text-sm leading-7 text-gray-400">
-              Your destination for electronics and home appliances.
-              Explore products for a more comfortable home.
-            </p>
-          </div>
+    {/* Brand */}
+    <div>
+      <a
+        href="/"
+        className="shrink-0 transition-transform duration-300 hover:scale-[1.02]"
+      >
+        <img
+          src="/images/logo3.png"
+          alt="SONAMA WILLS - Home of All Appliances"
+          className="h-12 w-auto max-w-[155px] object-contain sm:h-14 sm:max-w-[210px]"
+        />
+      </a>
 
-          <div>
-            <h3 className="font-bold">Quick Links</h3>
+      <p className="mt-5 max-w-xs text-sm leading-7 text-gray-400">
+        Your destination for electronics and home appliances.
+        Explore quality products for a more comfortable home.
+      </p>
+    </div>
 
-            <div className="mt-5 flex flex-col gap-3 text-sm text-gray-400">
-              <a href="/" className="footer-link">
-                Home
-              </a>
+    {/* Quick Links */}
+    <div>
+      <h3 className="font-bold">Quick Links</h3>
 
-              <a href="/products" className="footer-link">
-                All Products
-              </a>
+      <div className="mt-5 flex flex-col gap-3 text-sm text-gray-400">
+        <a href="/" className="footer-link">Home</a>
+        <a href="/products" className="footer-link">All Products</a>
+        <a href="/#categories" className="footer-link">Categories</a>
+        <a href="/#why-us" className="footer-link">Why Choose Us</a>
+      </div>
+    </div>
 
-              <a href="#categories" className="footer-link">
-                Categories
-              </a>
+    {/* Customer Care */}
+    <div>
+      <h3 className="font-bold">Customer Care</h3>
 
-              <a href="#why-us" className="footer-link">
-                Why Choose Us
-              </a>
-            </div>
-          </div>
+      <div className="mt-5 flex flex-col gap-3 text-sm text-gray-400">
+        <a href="/contact" className="footer-link">
+          Contact Support
+        </a>
 
-          <div>
-            <h3 className="font-bold">Customer Care</h3>
+        <a href="/track-order" className="footer-link">
+          Track Your Order
+        </a>
 
-            <div className="mt-5 flex flex-col gap-3 text-sm text-gray-400">
-              <a href="#contact" className="footer-link">
-                Contact Us
-              </a>
+        <a href="/shipping-policy" className="footer-link">
+          Shipping & Delivery
+        </a>
 
-              <a href="#shop" className="footer-link">
-                Product Enquiries
-              </a>
+        <a href="/returns-refunds" className="footer-link">
+          Returns & Refunds
+        </a>
+      </div>
+    </div>
 
-              <p>Ask us about delivery and warranty.</p>
-            </div>
-          </div>
+    {/* Contact Information */}
+    <div>
+      <h3 className="font-bold">Need Assistance?</h3>
 
-          <div>
-            <h3 className="font-bold">Need Assistance?</h3>
+      <p className="mt-4 text-sm leading-7 text-gray-400">
+        Our team is available to assist with product enquiries,
+        orders and customer support.
+      </p>
 
-            <p className="mt-4 text-sm leading-7 text-gray-400">
-              Contact our team to check product availability, pricing
-              and delivery options.
-            </p>
+      <div className="mt-5 flex flex-col gap-3 text-sm text-gray-400">
 
-            <a
-              href="https://wa.me/?text=Hello%2C%20I%20would%20like%20to%20enquire%20about%20your%20electronics."
-              target="_blank"
-              rel="noreferrer"
-              className="mt-5 inline-flex items-center gap-2 rounded-md bg-white px-5 py-3 text-xs font-bold text-[#142d4e] transition duration-300 hover:-translate-y-1 hover:bg-blue-50"
-            >
-              Enquire on WhatsApp <ArrowUpRight size={16} />
-            </a>
-          </div>
-        </div>
+        <a href="mailto:Support@gmail.com" className="footer-link">
+          Support@gmail.com
+        </a>
 
-        <div className="border-t border-white/10">
-          <div className="mx-auto flex max-w-[1500px] flex-col justify-between gap-3 px-5 py-6 text-xs text-gray-500 sm:px-8 md:flex-row lg:px-12">
-            <p>© 2026 SONAMA WILLS STORE. All rights reserved.</p>
-            <p>Electronics & Home Appliances</p>
-          </div>
-        </div>
-      </footer>
+        <a href="mailto:Contact@gmail.com" className="footer-link">
+          Contact@gmail.com
+        </a>
 
+        <a href="mailto:wilsonihe@gmail.com" className="footer-link">
+          Business Enquiries
+        </a>
+
+        <a href="tel:+2348068407634" className="footer-link">
+          +234 806 840 7634
+        </a>
+
+      </div>
+
+      <a
+        href="https://wa.me/2348068407634?text=Hello%2C%20I%20need%20assistance%20from%20SONAMA%20WILLS."
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-5 inline-flex items-center gap-2 rounded-md bg-white px-5 py-3 text-xs font-bold text-[#142d4e] transition duration-300 hover:-translate-y-1 hover:bg-blue-50"
+      >
+        Chat on WhatsApp <ArrowUpRight size={16} />
+      </a>
+    </div>
+
+  </div>
+
+  {/* Policies and Copyright */}
+  <div className="border-t border-white/10">
+    <div className="mx-auto flex max-w-[1500px] flex-col justify-between gap-5 px-5 py-6 text-xs text-gray-500 sm:px-8 md:flex-row md:items-center lg:px-12">
+
+      <p>© 2026 SONAMA WILLS STORE. All rights reserved.</p>
+
+      <div className="flex flex-wrap gap-x-5 gap-y-3">
+        <a href="/privacy-policy" className="footer-link">
+          Privacy Policy
+        </a>
+
+        <a href="/terms" className="footer-link">
+          Terms & Conditions
+        </a>
+      </div>
+
+    </div>
+  </div>
+</footer>
       {/* Cart drawer */}
       <CartDrawer
         isOpen={cartOpen}
