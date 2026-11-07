@@ -83,7 +83,7 @@ export default async function AccountPage() {
         <section className="mb-8 grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-gray-100 bg-white p-6">
             <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100">
-              <ShoppingBag size={21} />
+              <ShoppingBag size={21} className="text-black" />
             </div>
 
             <p className="text-sm text-gray-500">Account name</p>
@@ -97,7 +97,7 @@ export default async function AccountPage() {
 
           <div className="rounded-2xl border border-gray-100 bg-white p-6">
             <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100">
-              <Package size={21} />
+              <Package size={21} className="text-black" />
             </div>
 
             <p className="text-sm text-gray-500">Total orders</p>

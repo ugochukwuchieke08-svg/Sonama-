@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -8,6 +9,16 @@ import { createClient } from "@/lib/supabase/client";
 export default function RegisterPage() {
   const supabase = createClient();
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const requestedRedirect = searchParams.get("redirect");
+
+  const redirectTo =
+    requestedRedirect?.startsWith("/") &&
+    !requestedRedirect.startsWith("//") &&
+    !requestedRedirect.startsWith("/\\")
+      ? requestedRedirect
+      : "/account";
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -50,7 +61,9 @@ export default function RegisterPage() {
           data: {
             full_name: trimmedName,
           },
-          emailRedirectTo: `${siteUrl}/auth/callback?next=/account`,
+          emailRedirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(
+            redirectTo
+          )}`,
         },
       });
 
@@ -60,7 +73,7 @@ export default function RegisterPage() {
       }
 
       if (data.session) {
-        router.replace("/account");
+        router.replace(redirectTo);
         router.refresh();
         return;
       }
@@ -68,7 +81,6 @@ export default function RegisterPage() {
       setSuccess(
         "Your account has been created! Please check your email and click the confirmation link to activate your account. After confirming, you can log in."
       );
-
     } catch (err) {
       console.error("Registration error:", err);
 
@@ -83,7 +95,6 @@ export default function RegisterPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 py-10">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-sm sm:p-8">
-
         {/* Logo */}
         <Link href="/" className="mb-8 flex justify-center">
           <img
@@ -123,7 +134,7 @@ export default function RegisterPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your full name"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#1769e0]"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-black placeholder:text-gray-400 outline-none focus:border-[#1769e0]"
             />
           </div>
 
@@ -139,7 +150,7 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#1769e0]"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-black placeholder:text-gray-400 outline-none focus:border-[#1769e0]"
             />
           </div>
 
@@ -156,7 +167,7 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 8 characters"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#1769e0]"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-black placeholder:text-gray-400 outline-none focus:border-[#1769e0]"
             />
           </div>
 
@@ -190,7 +201,7 @@ export default function RegisterPage() {
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{" "}
           <Link
-            href="/login"
+            href={`/login?redirect=${encodeURIComponent(redirectTo)}`}
             className="font-semibold text-[#1769e0] hover:underline"
           >
             Log in

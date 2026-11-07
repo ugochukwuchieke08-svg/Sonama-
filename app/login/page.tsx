@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -9,10 +9,25 @@ export default function LoginPage() {
   const supabase = createClient();
   const router = useRouter();
 
+  const [redirectTo, setRedirectTo] = useState("/account");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedRedirect = params.get("redirect");
+
+    if (
+      requestedRedirect?.startsWith("/") &&
+      !requestedRedirect.startsWith("//") &&
+      !requestedRedirect.startsWith("/\\")
+    ) {
+      setRedirectTo(requestedRedirect);
+    }
+  }, []);
 
   async function handleLogin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -21,7 +36,7 @@ export default function LoginPage() {
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password,
       });
 
@@ -33,9 +48,7 @@ export default function LoginPage() {
           setError(
             "Your email address has not been confirmed. Please check your inbox and confirm your email before logging in."
           );
-        } else if (
-          error.code === "invalid_credentials"
-        ) {
+        } else if (error.code === "invalid_credentials") {
           setError(
             "Invalid email or password. Please check your login details. If you just registered, make sure your email confirmation was successful."
           );
@@ -46,9 +59,8 @@ export default function LoginPage() {
         return;
       }
 
-      router.replace("/account");
+      router.replace(redirectTo);
       router.refresh();
-
     } catch {
       setError(
         "Something went wrong. Please check your internet connection and try again."
@@ -101,7 +113,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#1769e0]"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-black outline-none focus:border-[#1769e0]"
             />
           </div>
 
@@ -117,7 +129,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#1769e0]"
+              className="w-full rounded-xl border border-gray-200 text-black px-4 py-3 outline-none focus:border-[#1769e0]"
             />
           </div>
 
@@ -142,7 +154,7 @@ export default function LoginPage() {
         <p className="mt-6 text-center text-sm text-gray-600">
           Don't have an account?{" "}
           <Link
-            href="/register"
+            href={`/register?redirect=${encodeURIComponent(redirectTo)}`}
             className="font-semibold text-[#1769e0] hover:underline"
           >
             Create one

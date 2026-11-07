@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -9,6 +9,7 @@ CheckCircle2,
 ShieldCheck,
 ShoppingBag,
 Truck,
+Package,
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
@@ -21,7 +22,7 @@ clearCart,
 type CartItem,
 } from "@/lib/cart";
 
-type PaymentMethod = "cod" | "online";
+type PaymentMethod = "online"; 
 
 type Product = {
 id: string;
@@ -45,8 +46,8 @@ const [products, setProducts] = useState<Product[]>([]);
 const [cartLoaded, setCartLoaded] = useState(false);
 const [productsLoading, setProductsLoading] = useState(true);
 
-const [paymentMethod, setPaymentMethod] =
-useState<PaymentMethod>("cod");
+const [paymentMethod] =
+useState<PaymentMethod>("online");
 
 const [isSubmitting, setIsSubmitting] = useState(false);
 const [orderNumber, setOrderNumber] = useState("");
@@ -251,21 +252,22 @@ const placeOrder = async (event: FormEvent<HTMLFormElement>) => {
     }
 
     // Redirect customers to Flutterwave.
-if (result.paymentMethod === "flutterwave") {
-  if (!result.checkoutUrl) {
-    throw new Error("Unable to generate payment link. Please try again.");
-  }
-
-  window.location.assign(result.checkoutUrl);
-  return;
+if (result.paymentMethod !== "flutterwave") {
+  throw new Error(
+    "Unable to initialize online payment. Please try again."
+  );
 }
 
-// Cash on Delivery.
-setOrderTotal(result.total);
-setOrderNumber(result.orderNumber);
-setOrderPaymentMethod("cod");
+if (!result.checkoutUrl) {
+  throw new Error(
+    "Unable to generate payment link. Please try again."
+  );
+}
 
-clearCart();
+window.location.assign(result.checkoutUrl);
+return;
+
+
 
   } catch (error) {
     console.error("Checkout error:", error);
@@ -393,6 +395,44 @@ SONAMA<span className="text-[#1769e0]">WILLS</span>
       <p className="mt-3 text-sm text-gray-500">
         Enter your details to complete your  order.
       </p>
+      <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-blue-100 bg-blue-50 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#1769e0]">
+            <Package size={22} />
+          </div>
+
+          <div>
+            <h3 className="font-bold text-[#142d4e]">
+              Track your orders with ease!
+            </h3>
+
+            <p className="mt-1 text-sm leading-6 text-gray-600">
+              Create a free SONAMA WILLS account to track your
+              orders, monitor delivery progress, check payment
+              status and access your purchase history anytime.
+            </p>
+
+            <p className="mt-2 text-xs font-medium text-gray-500">
+              Already have an account?{" "}
+              <Link
+                href="/login?redirect=/checkout"
+                className="font-bold text-[#1769e0] hover:underline"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
+  </div>
+
+  <Link
+    href="/register?redirect=/checkout"
+    className="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#1769e0] px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
+  >
+    Create Free Account
+    <ArrowRight size={16} className="ml-2" />
+  </Link>
+</div>
+      
     </div>
 
     {cart.length === 0 ? (
@@ -584,30 +624,7 @@ SONAMA<span className="text-[#1769e0]">WILLS</span>
             </div>
 
             <div className="space-y-3">
-              <label
-                className={`flex cursor-pointer items-start gap-4 rounded-2xl border p-4 transition ${
-                  paymentMethod === "cod"
-                    ? "border-[#1769e0] bg-blue-50/60"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="payment"
-                  value="cod"
-                  checked={paymentMethod === "cod"}
-                  onChange={() => setPaymentMethod("cod")}
-                  className="mt-1 accent-[#1769e0]"
-                />
-
-                <div>
-                  <p className="font-bold">Cash on Delivery</p>
-
-                  <p className="mt-1 text-xs leading-5 text-gray-500">
-                   Pay when your order is delivered.
-                  </p>
-                </div>
-              </label>
+             
 
               <label
                 className={`flex cursor-pointer items-start gap-4 rounded-2xl border p-4 transition ${
@@ -616,14 +633,7 @@ SONAMA<span className="text-[#1769e0]">WILLS</span>
                     : "border-gray-200 hover:border-gray-300"
                 }`}
               >
-                <input
-                  type="radio"
-                  name="payment"
-                  value="online"
-                  checked={paymentMethod === "online"}
-                  onChange={() => setPaymentMethod("online")}
-                  className="mt-1 accent-[#1769e0]"
-                />
+                
 
                 <div>
                   <p className="font-bold">Online Payment</p>
