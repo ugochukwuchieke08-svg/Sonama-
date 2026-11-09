@@ -269,42 +269,55 @@ ${form.message}
               />
             </div>
 
-            {/* Email */}
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-[#102746]">
-                Email Address *
-              </label>
+                        {/* Email */}
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
 
-              <input
-                type="email"
-                required
-                value={form.email}
-                onChange={(e) =>
-                  setForm({ ...form, email: e.target.value })
-                }
-                placeholder="you@example.com"
-                className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              />
-            </div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                  <Mail size={22} />
+                </div>
 
-            {/* Order Number */}
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-[#102746]">
-                Order Number
-                <span className="ml-2 font-normal text-gray-400">
-                  (Optional)
-                </span>
-              </label>
+                <h3 className="font-bold text-[#102746]">
+                  Email Support
+                </h3>
+              </div>
 
-              <input
-                type="text"
-                value={form.orderNumber}
-                onChange={(e) =>
-                  setForm({ ...form, orderNumber: e.target.value })
-                }
-                placeholder="Enter your order number"
-                className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              />
+              <div className="mt-5 space-y-4 text-sm">
+
+                <a
+                  href="mailto:support@sonamawillsstore.com"
+                  className="block text-gray-500 transition hover:text-blue-600"
+                >
+                  <span className="font-semibold text-[#102746]">
+                    Customer Support
+                  </span>
+                  <br />
+                  support@sonamawillsstore.com
+                </a>
+
+                <a
+                  href="mailto:contact@sonamawillsstore.com"
+                  className="block text-gray-500 transition hover:text-blue-600"
+                >
+                  <span className="font-semibold text-[#102746]">
+                    General Enquiries
+                  </span>
+                  <br />
+                  contact@sonamawillsstore.com
+                </a>
+
+                <a
+                  href="mailto:wilsonihe@sonamawillsstore.com"
+                  className="block text-gray-500 transition hover:text-blue-600"
+                >
+                  <span className="font-semibold text-[#102746]">
+                    Business Enquiries
+                  </span>
+                  <br />
+                  wilsonihe@sonamawillsstore.com
+                </a>
+
+              </div>
             </div>
 
             {/* Subject */}

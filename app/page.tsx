@@ -1361,7 +1361,8 @@ useEffect(() => {
         </div>
       </section>
 
-     {/* Footer */}
+
+{/* Footer */}
 <footer id="contact" className="scroll-mt-24 bg-[#0d1d32] text-white">
   <div className="mx-auto grid max-w-[1500px] gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 lg:grid-cols-4 lg:px-12 lg:py-16">
 
@@ -1430,15 +1431,24 @@ useEffect(() => {
 
       <div className="mt-5 flex flex-col gap-3 text-sm text-gray-400">
 
-        <a href="mailto:Support@gmail.com" className="footer-link">
-          Support@gmail.com
+        <a
+          href="mailto:support@sonamawillsstore.com"
+          className="footer-link"
+        >
+          support@sonamawillsstore.com
         </a>
 
-        <a href="mailto:Contact@gmail.com" className="footer-link">
-          Contact@gmail.com
+        <a
+          href="mailto:contact@sonamawillsstore.com"
+          className="footer-link"
+        >
+          contact@sonamawillsstore.com
         </a>
 
-        <a href="mailto:wilsonihe@gmail.com" className="footer-link">
+        <a
+          href="mailto:wilsonihe@sonamawillsstore.com"
+          className="footer-link"
+        >
           Business Enquiries
         </a>
 
@@ -1479,6 +1489,7 @@ useEffect(() => {
     </div>
   </div>
 </footer>
+
       {/* Cart drawer */}
       <CartDrawer
         isOpen={cartOpen}
