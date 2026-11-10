@@ -42,10 +42,14 @@ type Product = {
   is_featured: boolean;
   description?: string | null;
   features?: string[] | null;
+  installation_available: boolean;
+  installation_price: number;
+  kit_available: boolean;
+  kit_price: number;
+  insurance_available: boolean;
   created_at?: string;
   updated_at?: string;
 };
-
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=900&q=85";
 
@@ -77,6 +81,13 @@ image_urls: Array.isArray(data.image_urls)
   : [],
     is_active: Boolean(data.is_active),
     is_featured: Boolean(data.is_featured),
+    installation_available: Boolean(data.installation_available),
+    installation_price: Number(data.installation_price ?? 0),
+
+    kit_available: Boolean(data.kit_available),
+    kit_price: Number(data.kit_price ?? 0),
+
+    insurance_available: Boolean(data.insurance_available),
     description: data.description ?? null,
     features: Array.isArray(data.features)
       ? data.features.filter(
@@ -111,6 +122,9 @@ const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [installationSelected, setInstallationSelected] = useState(false);
+  const [kitSelected, setKitSelected] = useState(false);
+  const [insuranceSelected, setInsuranceSelected] = useState(false);
 
   // Fetch product details and related products.
   const fetchProduct = useCallback(async () => {
@@ -150,8 +164,14 @@ const [touchStartX, setTouchStartX] = useState<number | null>(null);
       }
 
       const selectedProduct = formatProduct(data);
-        setProduct(selectedProduct);
-        setActiveImageIndex(0);
+
+      setProduct(selectedProduct);
+      setActiveImageIndex(0);
+
+      setInstallationSelected(false);
+      setKitSelected(false);
+      setInsuranceSelected(false);
+      setQuantity(1);
 
       const {
         data: relatedData,
@@ -199,32 +219,35 @@ const [touchStartX, setTouchStartX] = useState<number | null>(null);
   }, []);
 
   // Add product to the shared cart.
-  const handleAddToCart = () => {
-    if (!product || product.stock_quantity <= 0) return;
+ const handleAddToCart = () => {
+  if (!product || product.stock_quantity <= 0) return;
 
-    const existingItem = cart.find(
-      (item) => item.id === product.id
+  const currentCart = getCart();
+
+  const currentProductQuantity = currentCart
+    .filter((item) => item.id === product.id)
+    .reduce((total, item) => total + item.quantity, 0);
+
+  if (currentProductQuantity + quantity > product.stock_quantity) {
+    window.alert(
+      `Only ${product.stock_quantity} unit(s) are currently available.`
     );
+    return;
+  }
 
-    const currentQuantity = existingItem?.quantity ?? 0;
+  const updatedCart = addProductToCart(product, quantity, {
+    installationSelected,
+    kitSelected,
+    insuranceSelected,
+  });
 
-    if (currentQuantity + quantity > product.stock_quantity) {
-      window.alert(
-        `Only ${product.stock_quantity} unit(s) are currently available.`
-      );
-      return;
-    }
+  setCart(updatedCart);
+  setAdded(true);
 
-    addProductToCart(product, quantity);
-
-    setCart(getCart());
-    setAdded(true);
-
-    window.setTimeout(() => {
-      setAdded(false);
-    }, 2500);
-  };
-
+  window.setTimeout(() => {
+    setAdded(false);
+  }, 2500);
+};
   // WhatsApp enquiry.
   const enquireOnWhatsApp = () => {
     if (!product) return;
@@ -370,10 +393,30 @@ const handleGalleryTouchEnd = (
       ? product.features
       : DEFAULT_FEATURES;
 
-  const cartQuantity =
-    cart.find((item) => item.id === product.id)?.quantity ?? 0;
+  const cartQuantity = cart
+  .filter((item) => item.id === product.id)
+  .reduce((total, item) => total + item.quantity, 0);
 
   const totalCartQuantity = getCartCount(cart);
+
+  const installationCost = installationSelected
+  ? product.installation_price
+  : 0;
+
+  const kitCost = kitSelected
+    ? product.kit_price
+    : 0;
+
+  const insuranceCost = insuranceSelected
+    ? product.price * 0.05
+    : 0;
+
+  const extrasTotal =
+    installationCost + kitCost + insuranceCost;
+
+  const unitTotal = product.price + extrasTotal;
+
+  const orderSubtotal = unitTotal * quantity;
 
   return (
     <main className="min-h-screen bg-[#fafafa] text-[#171923]">
@@ -587,6 +630,123 @@ const handleGalleryTouchEnd = (
                 : "Currently out of stock"}
             </div>
 
+            {/* Optional Services */}
+            {(
+              product.installation_available ||
+              product.kit_available ||
+              product.insurance_available
+            ) && (
+              <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+                <div className="mb-5">
+                  <h2 className="text-base font-black text-gray-900">
+                    Optional Services
+                  </h2>
+
+                  <p className="mt-1 text-xs leading-5 text-gray-500">
+                    Customize your purchase by selecting any additional services you need.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+
+                  {/* Installation */}
+                  {product.installation_available && (
+                    <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-gray-100 p-4 transition hover:border-blue-200 hover:bg-blue-50/40">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={installationSelected}
+                          onChange={(event) =>
+                            setInstallationSelected(event.target.checked)
+                          }
+                          className="mt-1 h-4 w-4 accent-[#1769e0]"
+                        />
+
+                        <div>
+                          <p className="text-sm font-bold text-gray-900">
+                            Installation Service
+                          </p>
+
+                          <p className="mt-1 text-xs text-gray-500">
+                            Professional installation for your product.
+                          </p>
+                        </div>
+                      </div>
+
+                      <span className="shrink-0 text-sm font-bold text-[#1769e0]">
+                        {formatPrice(product.installation_price)}
+                      </span>
+                    </label>
+                  )}
+
+                  {/* Kit */}
+                  {product.kit_available && (
+                    <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-gray-100 p-4 transition hover:border-blue-200 hover:bg-blue-50/40">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={kitSelected}
+                          onChange={(event) =>
+                            setKitSelected(event.target.checked)
+                          }
+                          className="mt-1 h-4 w-4 accent-[#1769e0]"
+                        />
+
+                        <div>
+                          <p className="text-sm font-bold text-gray-900">
+                            Accessories / Kit
+                          </p>
+
+                          <p className="mt-1 text-xs text-gray-500">
+                            Include the available product kit.
+                          </p>
+                        </div>
+                      </div>
+
+                      <span className="shrink-0 text-sm font-bold text-[#1769e0]">
+                        {formatPrice(product.kit_price)}
+                      </span>
+                    </label>
+                  )}
+
+                  {/* Insurance */}
+                  {product.insurance_available && (
+                    <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-gray-100 p-4 transition hover:border-blue-200 hover:bg-blue-50/40">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={insuranceSelected}
+                          onChange={(event) =>
+                            setInsuranceSelected(event.target.checked)
+                          }
+                          className="mt-1 h-4 w-4 accent-[#1769e0]"
+                        />
+
+                        <div>
+                          <p className="text-sm font-bold text-gray-900">
+                            Product Insurance
+                          </p>
+
+                          <p className="mt-1 text-xs text-gray-500">
+                            Optional insurance charged at 5% of the product price.
+                          </p>
+                        </div>
+                      </div>
+
+                      <span className="shrink-0 text-sm font-bold text-[#1769e0]">
+                        {formatPrice(product.price * 0.05)}
+                      </span>
+                    </label>
+                  )}
+
+                </div>
+
+                <p className="mt-4 text-[11px] leading-5 text-gray-400">
+                  All selected services are charged per product unit.
+                </p>
+              </div>
+            )}
+
             {/* Quantity selector */}
             <div className="mt-8">
               <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -633,9 +793,9 @@ const handleGalleryTouchEnd = (
             </div>
 
             <p className="mt-5 text-sm text-gray-500">
-              Subtotal:{" "}
+              Total:{" "}
               <span className="font-bold text-gray-900">
-                {formatPrice(product.price * quantity)}
+                {formatPrice(orderSubtotal)}
               </span>
             </p>
 

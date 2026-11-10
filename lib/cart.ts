@@ -1,9 +1,18 @@
 export const CART_STORAGE_KEY = "sonama-wills-cart";
 export const CART_UPDATED_EVENT = "sonama-cart-updated";
 
+export type CartSelections = {
+  installationSelected?: boolean;
+  kitSelected?: boolean;
+  insuranceSelected?: boolean;
+};
+
 export type CartItem = {
   id: string;
   quantity: number;
+  installationSelected: boolean;
+  kitSelected: boolean;
+  insuranceSelected: boolean;
 };
 
 export type CartProduct = {
@@ -30,21 +39,56 @@ function isValidQuantity(quantity: unknown): quantity is number {
   );
 }
 
+function normalizeSelections(
+  selections?: CartSelections
+) {
+  return {
+    installationSelected:
+      selections?.installationSelected === true,
+
+    kitSelected:
+      selections?.kitSelected === true,
+
+    insuranceSelected:
+      selections?.insuranceSelected === true,
+  };
+}
+
+/**
+ * Creates a unique identifier for each product configuration.
+ * The same product with different extras gets a different key.
+ */
+export function getCartItemKey(item: CartItem): string {
+  return JSON.stringify([
+    item.id,
+    item.installationSelected,
+    item.kitSelected,
+    item.insuranceSelected,
+  ]);
+}
+
 function normalizeCart(items: unknown[]): CartItem[] {
-  const quantities = new Map<string, number>();
+  const quantities = new Map<string, CartItem>();
 
   for (const item of items) {
     let id: string;
     let quantity: number;
+    let selections: CartSelections = {};
 
-    // Current format: { id, quantity }
+    // Current and previous object formats.
     if (
       item &&
       typeof item === "object" &&
       "id" in item &&
       "quantity" in item
     ) {
-      const cartItem = item as CartItem;
+      const cartItem = item as {
+        id: unknown;
+        quantity: unknown;
+        installationSelected?: unknown;
+        kitSelected?: unknown;
+        insuranceSelected?: unknown;
+      };
 
       if (
         !isValidId(cartItem.id) ||
@@ -55,6 +99,17 @@ function normalizeCart(items: unknown[]): CartItem[] {
 
       id = cartItem.id.trim();
       quantity = cartItem.quantity;
+
+      selections = {
+        installationSelected:
+          cartItem.installationSelected === true,
+
+        kitSelected:
+          cartItem.kitSelected === true,
+
+        insuranceSelected:
+          cartItem.insuranceSelected === true,
+      };
     }
 
     // Legacy format: "product-id"
@@ -67,21 +122,26 @@ function normalizeCart(items: unknown[]): CartItem[] {
       continue;
     }
 
-    const existing = quantities.get(id) || 0;
-
-    quantities.set(
-      id,
-      Math.min(existing + quantity, Number.MAX_SAFE_INTEGER)
-    );
-  }
-
-  return Array.from(
-    quantities,
-    ([id, quantity]) => ({
+    const normalizedItem: CartItem = {
       id,
       quantity,
-    })
-  );
+      ...normalizeSelections(selections),
+    };
+
+    const key = getCartItemKey(normalizedItem);
+    const existing = quantities.get(key);
+
+    if (existing) {
+      existing.quantity = Math.min(
+        existing.quantity + quantity,
+        Number.MAX_SAFE_INTEGER
+      );
+    } else {
+      quantities.set(key, normalizedItem);
+    }
+  }
+
+  return Array.from(quantities.values());
 }
 
 export function getCart(): CartItem[] {
@@ -104,7 +164,7 @@ export function getCart(): CartItem[] {
 }
 
 export function saveCart(cart: CartItem[]) {
-  if (!isBrowser()) return;
+  if (!isBrowser()) return false;
 
   try {
     const normalized = normalizeCart(cart);
@@ -127,7 +187,8 @@ export function saveCart(cart: CartItem[]) {
 
 export function addToCart(
   product: CartProduct,
-  quantity = 1
+  quantity = 1,
+  selections: CartSelections = {}
 ): CartItem[] {
   const cart = getCart();
 
@@ -142,21 +203,46 @@ export function addToCart(
 
   const productId = product.id.trim();
 
+  const normalizedSelections =
+    normalizeSelections(selections);
+
+  const newItem: CartItem = {
+    id: productId,
+    quantity,
+    ...normalizedSelections,
+  };
+
+  const newKey = getCartItemKey(newItem);
+
   const existing = cart.find(
-    (item) => item.id === productId
+    (item) => getCartItemKey(item) === newKey
   );
+
+  // Stock is shared across all configurations of the same product.
+  const totalProductQuantity = cart
+    .filter((item) => item.id === productId)
+    .reduce((total, item) => total + item.quantity, 0);
+
+  const remainingStock = Math.max(
+    0,
+    product.stock_quantity - totalProductQuantity
+  );
+
+  const quantityToAdd = Math.min(
+    quantity,
+    remainingStock
+  );
+
+  if (quantityToAdd <= 0) return cart;
 
   let updatedCart: CartItem[];
 
   if (existing) {
     updatedCart = cart.map((item) =>
-      item.id === productId
+      getCartItemKey(item) === newKey
         ? {
             ...item,
-            quantity: Math.min(
-              item.quantity + quantity,
-              product.stock_quantity
-            ),
+            quantity: item.quantity + quantityToAdd,
           }
         : item
     );
@@ -164,11 +250,8 @@ export function addToCart(
     updatedCart = [
       ...cart,
       {
-        id: productId,
-        quantity: Math.min(
-          quantity,
-          product.stock_quantity
-        ),
+        ...newItem,
+        quantity: quantityToAdd,
       },
     ];
   }
@@ -179,11 +262,11 @@ export function addToCart(
 }
 
 export function updateCartQuantity(
-  productId: string,
+  itemKey: string,
   quantity: number,
   stockQuantity: number
 ): CartItem[] {
-  if (!isValidId(productId)) {
+  if (!isValidId(itemKey)) {
     return getCart();
   }
 
@@ -194,23 +277,60 @@ export function updateCartQuantity(
     return getCart();
   }
 
+  const cart = getCart();
+
+  // Prefer an exact configuration match.
+  let target = cart.find(
+    (item) => getCartItemKey(item) === itemKey
+  );
+
+  // Backward compatibility for callers passing a product ID.
+  if (!target) {
+    const matchingItems = cart.filter(
+      (item) => item.id === itemKey
+    );
+
+    if (matchingItems.length === 1) {
+      target = matchingItems[0];
+    }
+  }
+
+  if (!target) return cart;
+
+  const targetKey = getCartItemKey(target);
+
   if (
     !Number.isSafeInteger(quantity) ||
     quantity <= 0 ||
     stockQuantity === 0
   ) {
-    return removeFromCart(productId);
+    return removeFromCart(targetKey);
   }
 
-  const cart = getCart();
+  const otherConfigurationsQuantity = cart
+    .filter(
+      (item) =>
+        item.id === target.id &&
+        getCartItemKey(item) !== targetKey
+    )
+    .reduce((total, item) => total + item.quantity, 0);
+
+  const availableForThisConfiguration = Math.max(
+    0,
+    stockQuantity - otherConfigurationsQuantity
+  );
+
+  if (availableForThisConfiguration === 0) {
+    return removeFromCart(targetKey);
+  }
 
   const updatedCart = cart.map((item) =>
-    item.id === productId
+    getCartItemKey(item) === targetKey
       ? {
           ...item,
           quantity: Math.min(
             quantity,
-            stockQuantity
+            availableForThisConfiguration
           ),
         }
       : item
@@ -222,11 +342,22 @@ export function updateCartQuantity(
 }
 
 export function removeFromCart(
-  productId: string
+  itemKey: string
 ): CartItem[] {
-  const updatedCart = getCart().filter(
-    (item) => item.id !== productId
+  const cart = getCart();
+
+  // Remove an exact configuration when its key is provided.
+  const exactMatch = cart.some(
+    (item) => getCartItemKey(item) === itemKey
   );
+
+  const updatedCart = exactMatch
+    ? cart.filter(
+        (item) => getCartItemKey(item) !== itemKey
+      )
+    : cart.filter(
+        (item) => item.id !== itemKey
+      );
 
   saveCart(updatedCart);
 

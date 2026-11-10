@@ -15,6 +15,7 @@ Package,
 import { createClient } from "@/lib/supabase/client";
 import {
 getCart,
+getCartItemKey,
 subscribeToCart,
 updateCartQuantity,
 removeFromCart,
@@ -25,13 +26,18 @@ type CartItem,
 type PaymentMethod = "online"; 
 
 type Product = {
-id: string;
-name: string;
-category: string | null;
-price: number;
-stock_quantity: number;
-image_url: string | null;
-is_active: boolean;
+  id: string;
+  name: string;
+  category: string | null;
+  price: number;
+  stock_quantity: number;
+  image_url: string | null;
+  is_active: boolean;
+  installation_available: boolean;
+  installation_price: number;
+  kit_available: boolean;
+  kit_price: number;
+  insurance_available: boolean;
 };
 
 const formatPrice = (price: number) =>
@@ -98,7 +104,7 @@ async function fetchProducts() {
   const { data, error: fetchError } = await supabase
     .from("products")
     .select(
-      "id, name, category, price, stock_quantity, image_url, is_active"
+      "id, name, category, price, stock_quantity, image_url, is_active, installation_available, installation_price, kit_available, kit_price, insurance_available"
     )
     .in("id", productIds)
     .eq("is_active", true);
@@ -124,27 +130,52 @@ return () => {
 }, [cart, cartLoaded, supabase]);
 
 const cartItems = useMemo(() => {
-return cart
-.map((cartItem) => {
-const product = products.find(
-(item) => item.id === cartItem.id
-);
+  return cart
+    .map((cartItem) => {
+      const product = products.find(
+        (item) => item.id === cartItem.id
+      );
 
-    if (!product) return null;
+      if (!product) return null;
 
-    return {
-      ...product,
-      quantity: cartItem.quantity,
-    };
-  })
-  .filter((item) => item !== null);
+      const installationCost =
+        cartItem.installationSelected && product.installation_available
+          ? Number(product.installation_price)
+          : 0;
 
+      const kitCost =
+        cartItem.kitSelected && product.kit_available
+          ? Number(product.kit_price)
+          : 0;
+
+      const insuranceCost =
+        cartItem.insuranceSelected && product.insurance_available
+          ? Number(product.price) * 0.05
+          : 0;
+
+      const unitTotal =
+        Number(product.price) +
+        installationCost +
+        kitCost +
+        insuranceCost;
+
+      return {
+        ...product,
+        ...cartItem,
+        itemKey: getCartItemKey(cartItem),
+        installationCost,
+        kitCost,
+        insuranceCost,
+        unitTotal,
+        lineTotal: unitTotal * cartItem.quantity,
+      };
+    })
+    .filter((item) => item !== null);
 }, [cart, products]);
 
 const subtotal = cartItems.reduce(
-(total, product) =>
-total + Number(product.price) * product.quantity,
-0
+  (total, product) => total + product.lineTotal,
+  0
 );
 
 // Handle the customer returning from Flutterwave.
@@ -176,12 +207,30 @@ useEffect(() => {
 }, [cartLoaded, productsLoading]);
 
 const unavailableItems = cart.filter(
-(cartItem) =>
-!products.some((product) => product.id === cartItem.id)
+  (cartItem) =>
+    !products.some((product) => product.id === cartItem.id)
 );
 
+const unavailableExtrasItems = cartItems.filter(
+  (item) =>
+    (item.installationSelected && !item.installation_available) ||
+    (item.kitSelected && !item.kit_available) ||
+    (item.insuranceSelected && !item.insurance_available)
+);
+
+const totalQuantityByProduct = new Map<string, number>();
+
+cart.forEach((item) => {
+  totalQuantityByProduct.set(
+    item.id,
+    (totalQuantityByProduct.get(item.id) || 0) + item.quantity
+  );
+});
+
 const outOfStockItems = cartItems.filter(
-(product) => product.stock_quantity < product.quantity
+  (product) =>
+    (totalQuantityByProduct.get(product.id) || 0) >
+    product.stock_quantity
 );
 
 const updateField = (
@@ -195,12 +244,12 @@ setForm((previous) => ({
 };
 
 const changeQuantity = (
-productId: string,
-quantity: number,
-stockQuantity: number
+  itemKey: string,
+  quantity: number,
+  stockQuantity: number
 ) => {
-updateCartQuantity(productId, quantity, stockQuantity);
-setError("");
+  updateCartQuantity(itemKey, quantity, stockQuantity);
+  setError("");
 };
 
 const placeOrder = async (event: FormEvent<HTMLFormElement>) => {
@@ -227,6 +276,13 @@ const placeOrder = async (event: FormEvent<HTMLFormElement>) => {
     return;
   }
 
+  if (unavailableExtrasItems.length > 0) {
+  setError(
+    "Some selected services are no longer available. Please return to your cart and update your selections."
+  );
+  return;
+}
+
   setIsSubmitting(true);
 
   try {
@@ -238,9 +294,12 @@ const placeOrder = async (event: FormEvent<HTMLFormElement>) => {
       body: JSON.stringify({
         customer: form,
         items: cart.map((item) => ({
-          id: item.id,
-          quantity: item.quantity,
-        })),
+        id: item.id,
+        quantity: item.quantity,
+        installationSelected: item.installationSelected,
+        kitSelected: item.kitSelected,
+        insuranceSelected: item.insuranceSelected,
+      })),
         paymentMethod,
       }),
     });
@@ -660,7 +719,7 @@ SONAMA<span className="text-[#1769e0]">WILLS</span>
 
           <div className="mt-6 space-y-5">
             {cartItems.map((product) => (
-              <div key={product.id} className="flex gap-3">
+              <div key={product.itemKey} className="flex gap-3">
                 <div className="relative flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-xl bg-gray-50 p-2">
                   <img
                     src={
@@ -686,20 +745,40 @@ SONAMA<span className="text-[#1769e0]">WILLS</span>
                   </h3>
 
                   <p className="mt-2 text-sm font-black text-[#142d4e]">
-                    {formatPrice(
-                      Number(product.price) * product.quantity
-                    )}
-                  </p>
+                  {formatPrice(product.lineTotal)}
+                </p>
+
+                <div className="mt-2 space-y-1 text-xs text-gray-500">
+                  <p>Product: {formatPrice(product.price)} each</p>
+
+                  {product.installationSelected && (
+                    <p>
+                      Installation: {formatPrice(product.installationCost)} each
+                    </p>
+                  )}
+
+                  {product.kitSelected && (
+                    <p>
+                      Kit/accessories: {formatPrice(product.kitCost)} each
+                    </p>
+                  )}
+
+                  {product.insuranceSelected && (
+                    <p>
+                      Insurance: {formatPrice(product.insuranceCost)} each
+                    </p>
+                  )}
+                </div>
 
                   <div className="mt-2 flex items-center gap-3">
                     <button
                       type="button"
                       onClick={() =>
                         changeQuantity(
-                          product.id,
-                          product.quantity - 1,
-                          product.stock_quantity
-                        )
+                        product.itemKey,
+                        product.quantity - 1,
+                        product.stock_quantity
+                      )
                       }
                       className="flex h-7 w-7 items-center justify-center rounded-lg border border-gray-200 text-sm font-bold hover:bg-gray-50"
                       aria-label={`Decrease quantity of ${product.name}`}
@@ -715,13 +794,14 @@ SONAMA<span className="text-[#1769e0]">WILLS</span>
                       type="button"
                       onClick={() =>
                         changeQuantity(
-                          product.id,
-                          product.quantity + 1,
-                          product.stock_quantity
-                        )
+                        product.itemKey,
+                        product.quantity + 1,
+                        product.stock_quantity
+                      )
                       }
                       disabled={
-                        product.quantity >= product.stock_quantity
+                        (totalQuantityByProduct.get(product.id) || 0) >=
+                        product.stock_quantity
                       }
                       className="flex h-7 w-7 items-center justify-center rounded-lg border border-gray-200 text-sm font-bold hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
                       aria-label={`Increase quantity of ${product.name}`}
@@ -731,7 +811,7 @@ SONAMA<span className="text-[#1769e0]">WILLS</span>
 
                     <button
                       type="button"
-                      onClick={() => removeFromCart(product.id)}
+                      onClick={() => removeFromCart(product.itemKey)}
                       className="ml-auto text-xs font-semibold text-red-500 hover:text-red-700"
                     >
                       Remove
@@ -754,6 +834,13 @@ SONAMA<span className="text-[#1769e0]">WILLS</span>
               Please remove them and continue.
             </div>
           )}
+
+          {unavailableExtrasItems.length > 0 && (
+          <div className="mt-5 rounded-xl bg-red-50 p-3 text-xs leading-5 text-red-600">
+            Some selected services are no longer available. Please
+            return to your cart and update your selections.
+          </div>
+        )}
 
           <div className="mt-7 space-y-3 border-t border-gray-100 pt-5">
             <div className="flex justify-between text-sm">
@@ -793,12 +880,13 @@ SONAMA<span className="text-[#1769e0]">WILLS</span>
           <button
             type="submit"
             disabled={
-              isSubmitting ||
-              productsLoading ||
-              unavailableItems.length > 0 ||
-              outOfStockItems.length > 0 ||
-              cartItems.length === 0
-            }
+            isSubmitting ||
+            productsLoading ||
+            unavailableItems.length > 0 ||
+            unavailableExtrasItems.length > 0 ||
+            outOfStockItems.length > 0 ||
+            cartItems.length === 0
+          }
             className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#1769e0] px-5 py-4 text-sm font-bold text-white shadow-lg shadow-blue-100 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting

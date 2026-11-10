@@ -12,18 +12,23 @@ Save,
 X,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-
 type ProductForm = {
-name: string;
-slug: string;
-sku: string;
-category: string;
-description: string;
-price: string;
-stock_quantity: string;
-image_url: string;
-is_active: boolean;
-is_featured: boolean;
+  name: string;
+  slug: string;
+  sku: string;
+  category: string;
+  description: string;
+  price: string;
+  stock_quantity: string;
+  image_url: string;
+  is_active: boolean;
+  is_featured: boolean;
+
+  installation_available: boolean;
+  installation_price: string;
+  kit_available: boolean;
+  kit_price: string;
+  insurance_available: boolean;
 };
 
 const emptyForm: ProductForm = {
@@ -37,6 +42,11 @@ stock_quantity: "0",
 image_url: "",
 is_active: true,
 is_featured: false,
+installation_available: false,
+installation_price: "0",
+kit_available: false,
+kit_price: "0",
+insurance_available: false,
 };
 
 export default function EditProductPage() {
@@ -88,8 +98,8 @@ try {
   const { data: product, error: productError } = await supabase
     .from("products")
     .select(
-      "id, name, slug, sku, category, description, price, stock_quantity, image_url, is_active, is_featured"
-    )
+  "id, name, slug, sku, category, description, price, stock_quantity, image_url, is_active, is_featured, installation_available, installation_price, kit_available, kit_price, insurance_available"
+)
     .eq("id", productId)
     .maybeSingle();
 
@@ -111,6 +121,11 @@ try {
     image_url: product.image_url ?? "",
     is_active: product.is_active ?? true,
     is_featured: product.is_featured ?? false,
+    installation_available: product.installation_available ?? false,
+    installation_price: String(product.installation_price ?? 0),
+    kit_available: product.kit_available ?? false,
+    kit_price: String(product.kit_price ?? 0),
+    insurance_available: product.insurance_available ?? false,
   });
 
   setImagePreview(product.image_url ?? "");
@@ -205,6 +220,29 @@ if (!userId) {
 const price = Number(form.price);
 const stock = Number(form.stock_quantity);
 
+const installationPrice = Number(form.installation_price);
+const kitPrice = Number(form.kit_price);
+
+if (
+  form.installation_available &&
+  (form.installation_price.trim() === "" ||
+    !Number.isFinite(installationPrice) ||
+    installationPrice < 0)
+) {
+  setError("Enter a valid installation price.");
+  return;
+}
+
+if (
+  form.kit_available &&
+  (form.kit_price.trim() === "" ||
+    !Number.isFinite(kitPrice) ||
+    kitPrice < 0)
+) {
+  setError("Enter a valid kit price.");
+  return;
+}
+
 if (!form.name.trim() || !form.category.trim()) {
   setError("Product name and category are required.");
   return;
@@ -252,6 +290,17 @@ try {
       image_url: imageUrl || null,
       is_active: form.is_active,
       is_featured: form.is_featured,
+      installation_available: form.installation_available,
+      installation_price: form.installation_available
+        ? installationPrice
+        : 0,
+
+      kit_available: form.kit_available,
+      kit_price: form.kit_available
+        ? kitPrice
+        : 0,
+
+      insurance_available: form.insurance_available,
     })
     .eq("id", productId);
 
@@ -484,6 +533,122 @@ Update product details, pricing, and available stock. </p> </div>
             </button>
           )}
         </section>
+
+<section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7">
+  <h2 className="mb-2 font-extrabold">Additional Services</h2>
+
+  <p className="mb-6 text-sm text-gray-500">
+    Configure optional services customers can select when purchasing this product.
+  </p>
+
+  <div className="grid gap-6 sm:grid-cols-2">
+
+    {/* Installation */}
+    <div className="rounded-xl border border-gray-200 p-5">
+      <label className="flex cursor-pointer items-center gap-3">
+        <input
+          type="checkbox"
+          checked={form.installation_available}
+          onChange={(e) =>
+            updateField("installation_available", e.target.checked)
+          }
+          className="h-4 w-4 accent-[#1769e0]"
+        />
+
+        <span className="text-sm font-bold">
+          Installation Available
+        </span>
+      </label>
+
+      <div className="mt-4">
+        <label className="mb-2 block text-sm font-semibold">
+          Installation Price (₦)
+        </label>
+
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          disabled={!form.installation_available}
+          value={form.installation_price}
+          onChange={(e) =>
+            updateField("installation_price", e.target.value)
+          }
+          className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#1769e0] disabled:bg-gray-100"
+        />
+      </div>
+    </div>
+
+    {/* Kit */}
+    <div className="rounded-xl border border-gray-200 p-5">
+      <label className="flex cursor-pointer items-center gap-3">
+        <input
+          type="checkbox"
+          checked={form.kit_available}
+          onChange={(e) =>
+            updateField("kit_available", e.target.checked)
+          }
+          className="h-4 w-4 accent-[#1769e0]"
+        />
+
+        <span className="text-sm font-bold">
+          Kit / Accessories Available
+        </span>
+      </label>
+
+      <div className="mt-4">
+        <label className="mb-2 block text-sm font-semibold">
+          Kit Price (₦)
+        </label>
+
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          disabled={!form.kit_available}
+          value={form.kit_price}
+          onChange={(e) =>
+            updateField("kit_price", e.target.value)
+          }
+          className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#1769e0] disabled:bg-gray-100"
+        />
+      </div>
+    </div>
+
+    {/* Insurance */}
+    <div className="rounded-xl border border-gray-200 p-5 sm:col-span-2">
+      <label className="flex cursor-pointer items-center gap-3">
+        <input
+          type="checkbox"
+          checked={form.insurance_available}
+          onChange={(e) =>
+            updateField("insurance_available", e.target.checked)
+          }
+          className="h-4 w-4 accent-[#1769e0]"
+        />
+
+        <span className="text-sm font-bold">
+          Product Insurance Available
+        </span>
+      </label>
+
+      <p className="mt-2 text-xs leading-5 text-gray-500">
+        Allow customers to protect this product with optional insurance.
+      </p>
+
+      <div className="mt-4 rounded-lg bg-blue-50 p-3">
+        <p className="text-sm font-bold text-[#1769e0]">
+          Insurance: 5% of product price
+        </p>
+
+        <p className="mt-1 text-xs text-gray-500">
+          Automatically calculated at checkout. No manual price entry required.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
 
         <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7">
           <h2 className="mb-5 font-extrabold">Visibility & Promotion</h2>

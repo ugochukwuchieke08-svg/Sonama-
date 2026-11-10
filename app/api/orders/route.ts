@@ -13,6 +13,10 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const flutterwaveSecretKey = process.env.FLW_SECRET_KEY;
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
+function roundMoney(value: number) {
+  return Number(value.toFixed(2));
+}
+
 export async function POST(request: Request) {
   try {
     if (!serviceKey || !supabaseUrl) {
@@ -27,17 +31,16 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { customer, items, paymentMethod } = body;
 
-
     const isFlutterwave =
-  paymentMethod === "online" ||
-  paymentMethod === "flutterwave";
+      paymentMethod === "online" ||
+      paymentMethod === "flutterwave";
 
-if (!isFlutterwave) {
-  return NextResponse.json(
-    { error: "Only online payment through Flutterwave is supported." },
-    { status: 400 }
-  );
-}
+    if (!isFlutterwave) {
+      return NextResponse.json(
+        { error: "Only online payment through Flutterwave is supported." },
+        { status: 400 }
+      );
+    }
 
     if (!flutterwaveSecretKey || !siteUrl) {
       console.error("Missing Flutterwave server configuration.");
@@ -108,22 +111,27 @@ if (!isFlutterwave) {
       );
     }
 
-    // Validate cart items.
+    // Validate and normalize cart items.
 
     const normalizedItems = items.map((item: any) => ({
-      id: String(item.id || ""),
-      quantity: Number(item.quantity),
+      id: String(item?.id || ""),
+      quantity: Number(item?.quantity),
+      installationSelected: item?.installationSelected === true,
+      kitSelected: item?.kitSelected === true,
+      insuranceSelected: item?.insuranceSelected === true,
     }));
 
-    const seenIds = new Set<string>();
+    // Merge identical product configurations.
+    // The same product with different options remains a separate line.
+
+    const mergedItems = new Map<string, (typeof normalizedItems)[number]>();
 
     for (const item of normalizedItems) {
       if (
         !item.id ||
         !Number.isInteger(item.quantity) ||
         item.quantity < 1 ||
-        item.quantity > 100 ||
-        seenIds.has(item.id)
+        item.quantity > 100
       ) {
         return NextResponse.json(
           { error: "Invalid product information in your cart." },
@@ -131,8 +139,30 @@ if (!isFlutterwave) {
         );
       }
 
-      seenIds.add(item.id);
+      const configurationKey = JSON.stringify([
+        item.id,
+        item.installationSelected,
+        item.kitSelected,
+        item.insuranceSelected,
+      ]);
+
+      const existing = mergedItems.get(configurationKey);
+
+      if (existing) {
+        existing.quantity += item.quantity;
+
+        if (existing.quantity > 100) {
+          return NextResponse.json(
+            { error: "Maximum quantity per product option is 100." },
+            { status: 400 }
+          );
+        }
+      } else {
+        mergedItems.set(configurationKey, { ...item });
+      }
     }
+
+    const finalItems = Array.from(mergedItems.values());
 
     const adminSupabase = createSupabaseClient(
       supabaseUrl,
@@ -147,48 +177,60 @@ if (!isFlutterwave) {
 
     // Require an authenticated and email-confirmed customer.
 
-const sessionSupabase = await createClient();
+    const sessionSupabase = await createClient();
 
-const {
-  data: { user },
-  error: authError,
-} = await sessionSupabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await sessionSupabase.auth.getUser();
 
-if (authError || !user) {
-  return NextResponse.json(
-    { error: "Please log in before placing your order." },
-    { status: 401 }
-  );
-}
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: "Please log in before placing your order." },
+        { status: 401 }
+      );
+    }
 
-if (!user.email || !user.email_confirmed_at) {
-  return NextResponse.json(
-    { error: "Please confirm your email address before placing an order." },
-    { status: 403 }
-  );
-}
+    if (!user.email || !user.email_confirmed_at) {
+      return NextResponse.json(
+        { error: "Please confirm your email address before placing an order." },
+        { status: 403 }
+      );
+    }
 
-if (email !== user.email.trim().toLowerCase()) {
-  return NextResponse.json(
-    {
-      error:
-        "Please use the email address associated with your SONAMA WILLS account.",
-    },
-    { status: 400 }
-  );
-}
+    if (email !== user.email.trim().toLowerCase()) {
+      return NextResponse.json(
+        {
+          error:
+            "Please use the email address associated with your SONAMA WILLS account.",
+        },
+        { status: 400 }
+      );
+    }
 
-    // Retrieve actual products and prices from Supabase.
+    // Retrieve authoritative product information from Supabase.
 
-    const productIds = normalizedItems.map(
-      (item) => item.id
-    );
+    const productIds = [
+      ...new Set(finalItems.map((item) => item.id)),
+    ];
 
     const { data: products, error: productError } =
       await adminSupabase
         .from("products")
         .select(
-          "id, name, price, stock_quantity, image_url, is_active"
+          `
+            id,
+            name,
+            price,
+            stock_quantity,
+            image_url,
+            is_active,
+            installation_available,
+            installation_price,
+            kit_available,
+            kit_price,
+            insurance_available
+          `
         )
         .in("id", productIds);
 
@@ -201,21 +243,27 @@ if (email !== user.email.trim().toLowerCase()) {
       );
     }
 
-    if (products.length !== normalizedItems.length) {
+    if (products.length !== productIds.length) {
       return NextResponse.json(
         { error: "Some products are no longer available." },
         { status: 400 }
       );
     }
 
-    // Calculate prices using database values.
+    // Check total quantity across every configuration of each product.
 
-    const orderItems = [];
-    let subtotal = 0;
+    const totalQuantityByProduct = new Map<string, number>();
 
-    for (const item of normalizedItems) {
+    for (const item of finalItems) {
+      totalQuantityByProduct.set(
+        item.id,
+        (totalQuantityByProduct.get(item.id) || 0) + item.quantity
+      );
+    }
+
+    for (const [productId, totalQuantity] of totalQuantityByProduct) {
       const product = products.find(
-        (product) => String(product.id) === item.id
+        (entry) => String(entry.id) === productId
       );
 
       if (!product || !product.is_active) {
@@ -225,11 +273,30 @@ if (email !== user.email.trim().toLowerCase()) {
         );
       }
 
-      if (Number(product.stock_quantity) < item.quantity) {
+      if (Number(product.stock_quantity) < totalQuantity) {
         return NextResponse.json(
           {
             error: `Only ${product.stock_quantity} units of ${product.name} are currently available.`,
           },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Calculate all prices using database values.
+    // Never trust prices submitted by the browser.
+
+    const orderItems = [];
+    let subtotal = 0;
+
+    for (const item of finalItems) {
+      const product = products.find(
+        (entry) => String(entry.id) === item.id
+      );
+
+      if (!product || !product.is_active) {
+        return NextResponse.json(
+          { error: "A product in your cart is no longer available." },
           { status: 400 }
         );
       }
@@ -243,8 +310,77 @@ if (email !== user.email.trim().toLowerCase()) {
         );
       }
 
-      const lineTotal = Number(
-        (unitPrice * item.quantity).toFixed(2)
+      // Validate selected extras against product availability.
+
+      if (
+        item.installationSelected &&
+        !product.installation_available
+      ) {
+        return NextResponse.json(
+          {
+            error: `Installation is not available for ${product.name}.`,
+          },
+          { status: 400 }
+        );
+      }
+
+      if (
+        item.kitSelected &&
+        !product.kit_available
+      ) {
+        return NextResponse.json(
+          {
+            error: `The optional kit is not available for ${product.name}.`,
+          },
+          { status: 400 }
+        );
+      }
+
+      if (
+        item.insuranceSelected &&
+        !product.insurance_available
+      ) {
+        return NextResponse.json(
+          {
+            error: `Insurance is not available for ${product.name}.`,
+          },
+          { status: 400 }
+        );
+      }
+
+      const installationPrice = item.installationSelected
+        ? Number(product.installation_price)
+        : 0;
+
+      const kitPrice = item.kitSelected
+        ? Number(product.kit_price)
+        : 0;
+
+      const insurancePrice = item.insuranceSelected
+        ? roundMoney(unitPrice * 0.05)
+        : 0;
+
+      if (
+        !Number.isFinite(installationPrice) ||
+        installationPrice < 0 ||
+        !Number.isFinite(kitPrice) ||
+        kitPrice < 0
+      ) {
+        return NextResponse.json(
+          { error: "Invalid optional service pricing." },
+          { status: 500 }
+        );
+      }
+
+      const finalUnitPrice = roundMoney(
+        unitPrice +
+        installationPrice +
+        kitPrice +
+        insurancePrice
+      );
+
+      const lineTotal = roundMoney(
+        finalUnitPrice * item.quantity
       );
 
       subtotal += lineTotal;
@@ -253,12 +389,28 @@ if (email !== user.email.trim().toLowerCase()) {
         product_id: String(product.id),
         product_name: product.name,
         product_image: product.image_url || null,
+
         quantity: item.quantity,
+
+        // Original product price.
         unit_price: unitPrice,
+
+        // Selected extras.
+        installation_selected: item.installationSelected,
+        installation_price: installationPrice,
+
+        kit_selected: item.kitSelected,
+        kit_price: kitPrice,
+
+        insurance_selected: item.insuranceSelected,
+        insurance_price: insurancePrice,
+
+        // Complete price including extras.
+        line_total: lineTotal,
       });
     }
 
-    subtotal = Number(subtotal.toFixed(2));
+    subtotal = roundMoney(subtotal);
 
     // Generate order number and payment reference.
 
@@ -312,7 +464,7 @@ if (email !== user.email.trim().toLowerCase()) {
       console.error("Order creation error:", orderError);
 
       return NextResponse.json(
-       { error: "We couldn't save your order. Please try again." },
+        { error: "We couldn't save your order. Please try again." },
         { status: 500 }
       );
     }
@@ -404,7 +556,7 @@ if (email !== user.email.trim().toLowerCase()) {
       return NextResponse.json(
         {
           error:
-  "We couldn't start your online payment. Please try again.",
+            "We couldn't start your online payment. Please try again.",
         },
         { status: 502 }
       );

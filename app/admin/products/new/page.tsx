@@ -14,16 +14,21 @@ X,
 import { createClient } from "@/lib/supabase/client";
 
 type ProductForm = {
-name: string;
-sku: string;
-category: string;
-brand: string;
-description: string;
-price: string;
-stock_quantity: string;
-image_url: string;
-is_active: boolean;
-is_featured: boolean;
+  name: string;
+  sku: string;
+  category: string;
+  brand: string;
+  description: string;
+  price: string;
+  stock_quantity: string;
+  image_url: string;
+  is_active: boolean;
+  is_featured: boolean;
+  installation_available: boolean;
+  installation_price: string;
+  kit_available: boolean;
+  kit_price: string;
+  insurance_available: boolean;
 };
 
 const initialForm: ProductForm = {
@@ -37,6 +42,11 @@ stock_quantity: "1",
 image_url: "",
 is_active: true,
 is_featured: false,
+installation_available: false,
+installation_price: "0",
+kit_available: false,
+kit_price: "0",
+insurance_available: false,
 };
 
 export default function NewProductPage() {
@@ -205,6 +215,9 @@ if (!userId) {
 const price = Number(form.price);
 const stock = Number(form.stock_quantity);
 
+const installationPrice = Number(form.installation_price);
+const kitPrice = Number(form.kit_price);
+
 if (!form.name.trim()) {
   setError("Enter the product name.");
   return;
@@ -226,6 +239,22 @@ if (
   stock < 0
 ) {
   setError("Stock quantity must be a whole number of zero or more.");
+  return;
+}
+
+if (
+  !Number.isFinite(installationPrice) ||
+  installationPrice < 0
+) {
+  setError("Enter a valid installation price.");
+  return;
+}
+
+if (
+  !Number.isFinite(kitPrice) ||
+  kitPrice < 0
+) {
+  setError("Enter a valid kit price.");
   return;
 }
 
@@ -258,6 +287,16 @@ const { error: insertError } = await supabase.from("products").insert({
   image_urls: additionalImages,
   is_active: form.is_active,
   is_featured: form.is_featured,
+  installation_available: form.installation_available,
+  installation_price: form.installation_available
+    ? installationPrice
+    : 0,
+
+  kit_available: form.kit_available,
+  kit_price: form.kit_available
+    ? kitPrice
+    : 0,
+    insurance_available: form.insurance_available,
 });
 
   if (insertError) {
@@ -470,6 +509,144 @@ Add a product to your store inventory. </p> </div>
       </section>
 
       <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7">
+        {/* Additional Services & Pricing */}
+<section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7">
+
+  <div className="mb-6">
+    <h2 className="font-extrabold">
+      Additional Services & Pricing
+    </h2>
+
+    <p className="mt-1 text-sm text-gray-500">
+      Configure optional installation and kit charges for this product.
+    </p>
+  </div>
+
+  <div className="grid gap-6 sm:grid-cols-2">
+
+    {/* Installation */}
+    <div className="rounded-xl border border-gray-200 p-5">
+
+      <label className="flex cursor-pointer items-center gap-3">
+        <input
+          type="checkbox"
+          checked={form.installation_available}
+          onChange={(e) => {
+            updateField("installation_available", e.target.checked);
+          }}
+          className="h-4 w-4 accent-[#1769e0]"
+        />
+
+        <span className="text-sm font-bold">
+          Installation Available
+        </span>
+      </label>
+
+      <p className="mt-2 text-xs text-gray-500">
+        Allow customers to request installation.
+      </p>
+
+      {form.installation_available && (
+        <label className="mt-5 block">
+          <span className="mb-2 block text-sm font-bold">
+            Installation Price (₦)
+          </span>
+
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.installation_price}
+            onChange={(e) =>
+              updateField("installation_price", e.target.value)
+            }
+            placeholder="e.g. 50000"
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#1769e0] focus:ring-4 focus:ring-blue-50"
+          />
+        </label>
+      )}
+
+    </div>
+
+    {/* Kit */}
+    <div className="rounded-xl border border-gray-200 p-5">
+
+      <label className="flex cursor-pointer items-center gap-3">
+        <input
+          type="checkbox"
+          checked={form.kit_available}
+          onChange={(e) => {
+            updateField("kit_available", e.target.checked);
+          }}
+          className="h-4 w-4 accent-[#1769e0]"
+        />
+
+        <span className="text-sm font-bold">
+          Installation Kit Available
+        </span>
+      </label>
+
+      <p className="mt-2 text-xs text-gray-500">
+        Allow customers to purchase the required installation kit.
+      </p>
+
+      {form.kit_available && (
+        <label className="mt-5 block">
+          <span className="mb-2 block text-sm font-bold">
+            Kit Price (₦)
+          </span>
+
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.kit_price}
+            onChange={(e) =>
+              updateField("kit_price", e.target.value)
+            }
+            placeholder="e.g. 45000"
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#1769e0] focus:ring-4 focus:ring-blue-50"
+          />
+        </label>
+      )}
+
+    </div>
+
+{/* Insurance */}
+<div className="rounded-xl border border-gray-200 p-5">
+
+  <label className="flex cursor-pointer items-center gap-3">
+    <input
+      type="checkbox"
+      checked={form.insurance_available}
+      onChange={(e) =>
+        updateField("insurance_available", e.target.checked)
+      }
+      className="h-4 w-4 accent-[#1769e0]"
+    />
+
+    <span className="text-sm font-bold">
+      Product Insurance Available
+    </span>
+  </label>
+
+  <p className="mt-2 text-xs leading-5 text-gray-500">
+    Allow customers to protect this product with optional insurance.
+  </p>
+
+  <div className="mt-4 rounded-lg bg-blue-50 p-3">
+    <p className="text-sm font-bold text-[#1769e0]">
+      Insurance: 5% of product price
+    </p>
+
+    <p className="mt-1 text-xs text-gray-500">
+      Automatically calculated at checkout. No manual price entry required.
+    </p>
+  </div>
+
+</div>
+  </div>
+</section>
   <div className="mb-6">
     <h2 className="font-extrabold">Product Images</h2>
     <p className="mt-1 text-sm text-gray-500">
