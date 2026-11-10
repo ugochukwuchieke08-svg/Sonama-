@@ -12,6 +12,15 @@ Save,
 X,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+
+const MAX_PRODUCT_IMAGES = 20;
+
+type ProductImage = {
+  id: string;
+  url: string;
+  file?: File;
+};
+
 type ProductForm = {
   name: string;
   slug: string;
@@ -61,8 +70,7 @@ const [saving, setSaving] = useState(false);
 const [uploading, setUploading] = useState(false);
 const [error, setError] = useState("");
 const [success, setSuccess] = useState("");
-const [imageFile, setImageFile] = useState<File | null>(null);
-const [imagePreview, setImagePreview] = useState("");
+const [images, setImages] = useState<ProductImage[]>([]);
 
 const loadProduct = useCallback(async () => {
 setLoading(true);
@@ -97,8 +105,8 @@ try {
 
   const { data: product, error: productError } = await supabase
     .from("products")
-    .select(
-  "id, name, slug, sku, category, description, price, stock_quantity, image_url, is_active, is_featured, installation_available, installation_price, kit_available, kit_price, insurance_available"
+   .select(
+  "id, name, slug, sku, category, description, price, stock_quantity, image_url, image_urls, is_active, is_featured, installation_available, installation_price, kit_available, kit_price, insurance_available"
 )
     .eq("id", productId)
     .maybeSingle();
@@ -128,7 +136,23 @@ try {
     insurance_available: product.insurance_available ?? false,
   });
 
-  setImagePreview(product.image_url ?? "");
+  const additionalImages = Array.isArray(product.image_urls)
+  ? product.image_urls.filter(
+      (url: unknown): url is string => typeof url === "string"
+    )
+  : [];
+
+const allImages = [
+  ...(product.image_url ? [product.image_url] : []),
+  ...additionalImages,
+];
+
+setImages(
+  allImages.slice(0, MAX_PRODUCT_IMAGES).map((url, index) => ({
+    id: `existing-${index}-${url}`,
+    url,
+  }))
+);
 } catch (err) {
   setError(
     err instanceof Error ? err.message : "Unable to load this product."
@@ -144,17 +168,7 @@ useEffect(() => {
 void loadProduct();
 }, [loadProduct]);
 
-useEffect(() => {
-if (!imageFile) return;
 
-
-const objectUrl = URL.createObjectURL(imageFile);
-setImagePreview(objectUrl);
-
-return () => URL.revokeObjectURL(objectUrl);
-
-
-}, [imageFile]);
 
 function updateField<K extends keyof ProductForm>(
 key: K,
@@ -163,47 +177,65 @@ value: ProductForm[K]
 setForm((current) => ({ ...current, [key]: value }));
 }
 
-async function uploadImage(): Promise<string> {
-if (!imageFile) return form.image_url;
+async function uploadImages(): Promise<string[]> {
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-
-const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-if (!cloudName || !uploadPreset) {
-  throw new Error("Cloudinary environment variables are missing.");
-}
-
-setUploading(true);
-
-try {
-  const body = new FormData();
-  body.append("file", imageFile);
-  body.append("upload_preset", uploadPreset);
-  body.append("folder", "sonama-wills/products");
-
-  const response = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-    {
-      method: "POST",
-      body,
-    }
-  );
-
-  const result = await response.json();
-
-  if (!response.ok || !result.secure_url) {
-    throw new Error(
-      result.error?.message || "Could not upload the new image."
-    );
+  if (!cloudName || !uploadPreset) {
+    throw new Error("Cloudinary environment variables are missing.");
   }
 
-  return result.secure_url as string;
-} finally {
-  setUploading(false);
-}
+  const imagesToUpload = images.filter(
+    (image): image is ProductImage & { file: File } => !!image.file
+  );
 
+  if (imagesToUpload.length === 0) {
+    return images.map((image) => image.url);
+  }
 
+  setUploading(true);
+
+  try {
+    const uploadedUrls = await Promise.all(
+      imagesToUpload.map(async (image) => {
+        const body = new FormData();
+
+        body.append("file", image.file);
+        body.append("upload_preset", uploadPreset);
+        body.append("folder", "sonama-wills/products");
+
+        const response = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          {
+            method: "POST",
+            body,
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.secure_url) {
+          throw new Error(
+            result.error?.message || "Could not upload an image."
+          );
+        }
+
+        return result.secure_url as string;
+      })
+    );
+
+    let uploadedIndex = 0;
+
+    return images.map((image) => {
+      if (image.file) {
+        return uploadedUrls[uploadedIndex++];
+      }
+
+      return image.url;
+    });
+  } finally {
+    setUploading(false);
+  }
 }
 
 async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -271,11 +303,20 @@ const slug =
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "") || form.slug;
 
+    if (images.length > MAX_PRODUCT_IMAGES) {
+  setError(`A product can have a maximum of ${MAX_PRODUCT_IMAGES} images.`);
+  return;
+}
+
 setSaving(true);
 
 try {
-  const imageUrl = await uploadImage();
-  const supabase = createClient();
+const uploadedImages = await uploadImages();
+
+const mainImage = uploadedImages[0] || null;
+const additionalImages = uploadedImages.slice(1);
+
+const supabase = createClient();
 
   const { error: updateError } = await supabase
     .from("products")
@@ -287,7 +328,8 @@ try {
       description: form.description.trim(),
       price,
       stock_quantity: stock,
-      image_url: imageUrl || null,
+      image_url: mainImage,
+      image_urls: additionalImages,
       is_active: form.is_active,
       is_featured: form.is_featured,
       installation_available: form.installation_available,
@@ -479,60 +521,131 @@ Update product details, pricing, and available stock. </p> </div>
         </section>
 
         <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7">
-          <h2 className="font-extrabold">Product Image</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Keep the current image or select a replacement.
+  <div className="mb-6">
+    <h2 className="font-extrabold">Product Images</h2>
+
+    <p className="mt-1 text-sm text-gray-500">
+      Manage your product gallery. The first image will be the main product image.
+    </p>
+
+    <p className="mt-2 text-xs font-semibold text-[#1769e0]">
+      {images.length}/{MAX_PRODUCT_IMAGES} images
+    </p>
+  </div>
+
+  <label className="flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-[#fafafa] p-6 text-center transition hover:border-blue-300 hover:bg-blue-50/40">
+    <ImagePlus size={28} className="mb-3 text-[#1769e0]" />
+
+    <span className="text-sm font-bold">
+      Add product images
+    </span>
+
+    <span className="mt-1 text-xs text-gray-500">
+      PNG, JPG or WEBP · Maximum 10MB each
+    </span>
+
+    <span className="mt-2 text-xs font-semibold text-[#1769e0]">
+      {MAX_PRODUCT_IMAGES - images.length} image slots remaining
+    </span>
+
+    <input
+      type="file"
+      accept="image/png,image/jpeg,image/webp"
+      multiple
+      disabled={images.length >= MAX_PRODUCT_IMAGES}
+      className="sr-only"
+      onChange={(e) => {
+        const files = Array.from(e.target.files ?? []);
+
+        if (images.length + files.length > MAX_PRODUCT_IMAGES) {
+          setError(
+            `You can have a maximum of ${MAX_PRODUCT_IMAGES} images per product.`
+          );
+          e.target.value = "";
+          return;
+        }
+
+        const oversizedFile = files.find(
+          (file) => file.size > 10 * 1024 * 1024
+        );
+
+        if (oversizedFile) {
+          setError(`${oversizedFile.name} is larger than 10MB.`);
+          e.target.value = "";
+          return;
+        }
+
+        const invalidFile = files.find(
+          (file) =>
+            !["image/png", "image/jpeg", "image/webp"].includes(file.type)
+        );
+
+        if (invalidFile) {
+          setError(`${invalidFile.name} is not a supported image format.`);
+          e.target.value = "";
+          return;
+        }
+
+        setError("");
+
+        const newImages = files.map((file) => ({
+          id: crypto.randomUUID(),
+          url: URL.createObjectURL(file),
+          file,
+        }));
+
+        setImages((current) => [...current, ...newImages]);
+
+        e.target.value = "";
+      }}
+    />
+  </label>
+
+  {images.length > 0 && (
+    <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+      {images.map((image, index) => (
+        <div
+          key={image.id}
+          className="relative rounded-xl border border-gray-200 bg-gray-50 p-2"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={image.url}
+            alt={`Product image ${index + 1}`}
+            className="h-36 w-full rounded-lg bg-white object-contain"
+          />
+
+          {index === 0 && (
+            <span className="absolute left-3 top-3 rounded-md bg-[#1769e0] px-2 py-1 text-[10px] font-bold text-white">
+              MAIN IMAGE
+            </span>
+          )}
+
+          <button
+            type="button"
+            onClick={() => {
+              if (image.file) {
+                URL.revokeObjectURL(image.url);
+              }
+
+              setImages((current) =>
+                current.filter((item) => item.id !== image.id)
+              );
+            }}
+            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-white text-red-600 shadow-sm transition hover:bg-red-50"
+            aria-label={`Remove image ${index + 1}`}
+          >
+            <X size={15} />
+          </button>
+
+          <p className="mt-2 truncate text-xs font-medium text-gray-500">
+            {image.file?.name || `Product image ${index + 1}`}
           </p>
-
-          {imagePreview && (
-            <div className="mt-5">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={imagePreview}
-                alt="Current product"
-                className="h-44 w-44 rounded-xl border border-gray-100 bg-white object-contain p-2"
-              />
-            </div>
-          )}
-
-          <label className="mt-5 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-[#fafafa] p-6 text-center hover:border-blue-300 hover:bg-blue-50/40">
-            <ImagePlus size={27} className="mb-3 text-[#1769e0]" />
-            <span className="text-sm font-bold">
-              {imageFile ? imageFile.name : "Choose replacement image"}
-            </span>
-            <span className="mt-1 text-xs text-gray-500">
-              PNG, JPG or WEBP · Maximum 10MB
-            </span>
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              className="sr-only"
-              onChange={(e) => {
-                const file = e.target.files?.[0] ?? null;
-
-                if (file && file.size > 10 * 1024 * 1024) {
-                  setError("Choose an image smaller than 10MB.");
-                  e.target.value = "";
-                  return;
-                }
-
-                setError("");
-                setImageFile(file);
-              }}
-            />
-          </label>
-
-          {imageFile && (
-            <button
-              type="button"
-              onClick={() => setImageFile(null)}
-              className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-red-600"
-            >
-              <X size={15} />
-              Remove replacement image
-            </button>
-          )}
-        </section>
+        </div>
+      ))}
+    </div>
+  )}
+</section>
 
 <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7">
   <h2 className="mb-2 font-extrabold">Additional Services</h2>
@@ -709,7 +822,7 @@ Update product details, pricing, and available stock. </p> </div>
               <Save size={18} />
             )}
             {uploading
-              ? "Uploading image..."
+              ? "Uploading images..."
               : saving
                 ? "Saving changes..."
                 : "Save Changes"}

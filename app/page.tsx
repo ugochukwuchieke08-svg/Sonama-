@@ -1445,27 +1445,13 @@ useEffect(() => {
           contact@sonamawillsstore.com
         </a>
 
-        <a
-          href="mailto:wilsonihe@sonamawillsstore.com"
-          className="footer-link"
-        >
-          Business Enquiries
-        </a>
+        
 
-        <a href="tel:+2348068407634" className="footer-link">
-          +234 806 840 7634
-        </a>
+        
 
       </div>
 
-      <a
-        href="https://wa.me/2348068407634?text=Hello%2C%20I%20need%20assistance%20from%20SONAMA%20WILLS."
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-5 inline-flex items-center gap-2 rounded-md bg-white px-5 py-3 text-xs font-bold text-[#142d4e] transition duration-300 hover:-translate-y-1 hover:bg-blue-50"
-      >
-        Chat on WhatsApp <ArrowUpRight size={16} />
-      </a>
+      
     </div>
 
   </div>

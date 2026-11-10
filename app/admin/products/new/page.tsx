@@ -13,6 +13,8 @@ X,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
+const MAX_PRODUCT_IMAGES = 20;
+
 type ProductForm = {
   name: string;
   sku: string;
@@ -255,6 +257,11 @@ if (
   kitPrice < 0
 ) {
   setError("Enter a valid kit price.");
+  return;
+}
+
+if (imageFiles.length > MAX_PRODUCT_IMAGES) {
+  setError(`You can upload a maximum of ${MAX_PRODUCT_IMAGES} images.`);
   return;
 }
 
@@ -650,7 +657,7 @@ Add a product to your store inventory. </p> </div>
   <div className="mb-6">
     <h2 className="font-extrabold">Product Images</h2>
     <p className="mt-1 text-sm text-gray-500">
-      Upload up to 6 images. The first image will be the main product image.
+      Upload up to 20 images. The first image will be the main product image.
     </p>
   </div>
 
@@ -668,7 +675,7 @@ Add a product to your store inventory. </p> </div>
     </span>
 
     <span className="mt-2 text-xs font-semibold text-[#1769e0]">
-      {imageFiles.length}/6 images selected
+      {imageFiles.length}/{MAX_PRODUCT_IMAGES} images selected
     </span>
 
     <input
@@ -679,11 +686,11 @@ Add a product to your store inventory. </p> </div>
       onChange={(e) => {
         const files = Array.from(e.target.files ?? []);
 
-        if (files.length > 6) {
-          setError("You can upload a maximum of 6 images.");
-          e.target.value = "";
-          return;
-        }
+       if (files.length > MAX_PRODUCT_IMAGES) {
+        setError(`You can upload a maximum of ${MAX_PRODUCT_IMAGES} images.`);
+        e.target.value = "";
+        return;
+      }
 
         const oversizedFile = files.find(
           (file) => file.size > 10 * 1024 * 1024
