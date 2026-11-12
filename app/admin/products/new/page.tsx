@@ -286,7 +286,7 @@ const { error: insertError } = await supabase.from("products").insert({
   slug,
   sku: form.sku.trim() || null,
   category: form.category.trim(),
-  brand: form.brand,
+  brand: form.brand.trim() || null,
   description: form.description.trim(),
   price,
   stock_quantity: stock,
@@ -404,27 +404,35 @@ Add a product to your store inventory. </p> </div>
             <select
               required
               value={form.category}
-              onChange={(e) => updateField("category", e.target.value)}
+              onChange={(e) => {
+                setForm((current) => ({
+                  ...current,
+                  category: e.target.value,
+                  brand: "",
+                }));
+              }}
               className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none focus:border-[#1769e0] focus:ring-4 focus:ring-blue-50"
             >
               <option value="">Select category</option>
               <option value="Televisions">Televisions</option>
+              <option value="Refrigerators">Refrigerators</option>
+              <option value="Freezers">Freezers</option>
               <option value="Washing Machines">Washing Machines</option>
-              <option value="Refrigerators & Freezers">
-                Refrigerators & Freezers
-              </option>
               <option value="Air Conditioners">Air Conditioners</option>
               <option value="Audio">Audio</option>
-              <option value="Kitchen Appliances">Kitchen Appliances</option>
+              <option value="Kitchen/Home Appliances">Kitchen/Home Appliances</option>
               <option value="Small Appliances">Small Appliances</option>
               <option value="Accessories">Accessories</option>
+              <option value="Computers & Accessories">Computers & Accessories</option>
+              <option value="Solar & Power Solutions">Solar & Power Solutions</option>
+              <option value="Office Furniture">Office Furniture</option>
               <option value="Other">Other</option>
             </select>
           </label>
         <label className="block">
-          <span className="mb-2 block text-sm font-bold">
-            Brand <span className="text-red-500">*</span>
-          </span>
+        <span className="mb-2 block text-sm font-bold">
+          Brand <span className="text-gray-400">(Optional)</span>
+        </span>
 
           <select
             required
@@ -438,8 +446,23 @@ Add a product to your store inventory. </p> </div>
                 ? "Loading brands..."
                 : !form.category
                   ? "Select a category first"
-                  : "Select brand"}
+                  : brands.filter((brand) =>
+                      brand.categories.includes(form.category)
+                    ).length === 0
+                    ? "No brands listed  leave blank if applicable"
+                    : "Select brand"}
             </option>
+
+            {brands
+              .filter(
+                (brand) =>
+                  brand.categories.includes(form.category)
+              )
+              .map((brand) => (
+                <option key={brand.id} value={brand.name}>
+                  {brand.name}
+                </option>
+              ))}
 
             {brands
               .filter(
