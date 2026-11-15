@@ -1,0 +1,1052 @@
+[
+	{
+		"name": "LG Split AC 2.0 HP Standard",
+		"sku": ":LGSPL20HPSTANDARD",
+		"slug": "lg-split-ac-2-0-hp-standard",
+		"price": 588000
+	},
+	{
+		"name": "washing machine",
+		"sku": "40",
+		"slug": "washing-machine",
+		"price": 500000
+	},
+	{
+		"name": "Actiu ARKITEK MEETING TABLE W58",
+		"sku": "ACTAK1G012416CCFV590",
+		"slug": "actiu-arkitek-meeting-table-w58",
+		"price": 5868500
+	},
+	{
+		"name": "Deye HV Battery Control Box BOS-G PRO Series (BOS-G-PDU-2)",
+		"sku": "DEYEHVBOS-G-PDU-PRO",
+		"slug": "deye-hv-battery-control-box-bos-g-pro-series-bos-g-pdu-2",
+		"price": 1421000
+	},
+	{
+		"name": "Deye HV String Inverter 136kW 3-Phase (SUN-136K-G01P3-EU-AM8)",
+		"sku": "DEYEINV136K-G",
+		"slug": "deye-hv-string-inverter-136kw-3-phase-sun-136k-g01p3-eu-am8",
+		"price": 6437500
+	},
+	{
+		"name": "Deye Hybrid Inverter 16kW |LV Battery Supported| (SUN-16K-SG01LP1-EU-AM3-P) - Single Phase",
+		"sku": "DEYEINV16K-SG01LP1-E",
+		"slug": "deye-hybrid-inverter-16kw-lv-battery-supported-sun-16k-sg01lp1-eu-am3-p-single-phase",
+		"price": 3185000
+	},
+	{
+		"name": "Deye Hybrid Inverter 20kW |LV Battery Supported| (SUN-20K-SG05LP3-EU-SM2) - Three Phase",
+		"sku": "DEYEINV20K-SG05LP3-E",
+		"slug": "deye-hybrid-inverter-20kw-lv-battery-supported-sun-20k-sg05lp3-eu-sm2-three-phase",
+		"price": 3849875
+	},
+	{
+		"name": "Deye Hybrid Inverter 8kW |LV Battery Supported| (SUN-8K-SG06LP1-EU-CM3) - Single Phase",
+		"sku": "DEYEINV8K-SG06LP1-EU",
+		"slug": "deye-hybrid-inverter-8kw-lv-battery-supported-sun-8k-sg06lp1-eu-cm3-single-phase",
+		"price": 1741250
+	},
+	{
+		"name": "Growatt SIM 6000 ES Future-H Series 6KW Inverter + 5.5kWh Battery",
+		"sku": "GROWATTSIM1",
+		"slug": "growatt-sim-6000-es-future-h-series-6kw-inverter-5-5kwh-battery",
+		"price": 2051500
+	},
+	{
+		"name": "Hisense Party Rocker Speaker 300W (HP110)",
+		"sku": "HISAUD110HP",
+		"slug": "hisense-party-rocker-speaker-300w-hp110",
+		"price": 399000
+	},
+	{
+		"name": "Hisense Soundbar with Subwoofer 160W 2.1CH (AX2107G)",
+		"sku": "HISAUD2107G-AX",
+		"slug": "hisense-soundbar-with-subwoofer-160w-2-1ch-ax2107g",
+		"price": 280920
+	},
+	{
+		"name": "Hisense Soundbar with Subwoofer 200W 2.1CH (HS218)",
+		"sku": "HISAUD218",
+		"slug": "hisense-soundbar-with-subwoofer-200w-2-1ch-hs218",
+		"price": 208320
+	},
+	{
+		"name": "Hisense Soundbar with Subwoofer 500W 3.1CH (AX3100Q)",
+		"sku": "HISAUD3100Q-AX",
+		"slug": "hisense-soundbar-with-subwoofer-500w-3-1ch-ax3100q",
+		"price": 248750
+	},
+	{
+		"name": "Hisense Soundbar with Subwoofer 600W 5.1.4CH (AX5140Q)",
+		"sku": "HISAUD5140Q-AX",
+		"slug": "hisense-soundbar-with-subwoofer-600w-5-1-4ch-ax5140q",
+		"price": 466800
+	},
+	{
+		"name": "Hisense Mini Hi-Fi System 810W (HA700)",
+		"sku": "HISAUD700HA",
+		"slug": "hisense-mini-hi-fi-system-810w-ha700",
+		"price": 298800
+	},
+	{
+		"name": "Hisense Chest Freezer 372L Silver (480SH-FC)",
+		"sku": "HISFRZ480SH-FC",
+		"slug": "hisense-chest-freezer-372l-silver-480sh-fc",
+		"price": 686000
+	},
+	{
+		"name": "Hisense Floor Standing AC 10.0 HP Normal",
+		"sku": "HISFS10HP",
+		"slug": "hisense-floor-standing-ac-10-0-hp-normal",
+		"price": 4980000
+	},
+	{
+		"name": "Hisense Floor Standing AC 2.0 HP Normal",
+		"sku": "HISFS2HP",
+		"slug": "hisense-floor-standing-ac-2-0-hp-normal",
+		"price": 838800
+	},
+	{
+		"name": "Hisense Floor Standing AC 2.0 HP Inverter",
+		"sku": "HISFS2HPINV",
+		"slug": "hisense-floor-standing-ac-2-0-hp-inverter",
+		"price": 1074000
+	},
+	{
+		"name": "Hisense Floor Standing AC 3.0 HP Normal",
+		"sku": "HISFS3HP",
+		"slug": "hisense-floor-standing-ac-3-0-hp-normal",
+		"price": 1135200
+	},
+	{
+		"name": "Hisense Floor Standing AC 3.0 HP Inverter",
+		"sku": "HISFS3HPINV",
+		"slug": "hisense-floor-standing-ac-3-0-hp-inverter",
+		"price": 1316400
+	},
+	{
+		"name": "Hisense Floor Standing Tower AC 3.0 HP Inverter",
+		"sku": "HISFS3HPINV-TW",
+		"slug": "hisense-floor-standing-tower-ac-3-0-hp-inverter",
+		"price": 1411200
+	},
+	{
+		"name": "Hisense Floor Standing AC 5.5 HP Inverter",
+		"sku": "HISFS55HPINV",
+		"slug": "hisense-floor-standing-ac-5-5-hp-inverter",
+		"price": 2270400
+	},
+	{
+		"name": "Hisense Floor Standing AC 5.0 HP Normal",
+		"sku": "HISFS5HP",
+		"slug": "hisense-floor-standing-ac-5-0-hp-normal",
+		"price": 1978800
+	},
+	{
+		"name": "Hisense Ice Maker 9000 With Capacity: 45kg / 24h",
+		"sku": "HISICM9000",
+		"slug": "hisense-ice-maker-9000-with-capacity-45kg-24h",
+		"price": 598750
+	},
+	{
+		"name": "Hisense Monitor 34 Inch G6H WQHD 3440*1440p 1500R 165Hz Curved Gaming Monitor",
+		"sku": "HISMON34G6K-PRO",
+		"slug": "hisense-monitor-34-inch-g6h-wqhd-3440-1440p-1500r-165hz-curved-gaming-monitor",
+		"price": 432000
+	},
+	{
+		"name": "Hisense Speed Oven - Microwave  28L 1800W (H28MOSP1)",
+		"sku": "HISMWO28MOBSP1",
+		"slug": "hisense-speed-oven-microwave-28l-1800w-h28mosp1",
+		"price": 525000
+	},
+	{
+		"name": "Hisense Portable AC 1.5 HP",
+		"sku": "HISPAC15HP",
+		"slug": "hisense-portable-ac-1-5-hp",
+		"price": 492500
+	},
+	{
+		"name": "Hisense Top Freezer Refrigerator 124L (172DR)",
+		"sku": "HISREF172DR",
+		"slug": "hisense-top-freezer-refrigerator-124l-172dr",
+		"price": 348750
+	},
+	{
+		"name": "Hisense Showcase Refrigerator 277L (36FC-FL)",
+		"sku": "HISREF36FC-FL",
+		"slug": "hisense-showcase-refrigerator-277l-36fc-fl",
+		"price": 686250
+	},
+	{
+		"name": "Hisense Top Freezer Refrigerator 504L (RD-66WR)",
+		"sku": "HISREF66WR-RD",
+		"slug": "hisense-top-freezer-refrigerator-504l-rd-66wr",
+		"price": 886250
+	},
+	{
+		"name": "Hisense SxS Refrigerator 541L (71WS-RC)",
+		"sku": "HISREF71WS-RC",
+		"slug": "hisense-sxs-refrigerator-541l-71ws-rc",
+		"price": 1050000
+	},
+	{
+		"name": "Hisense Split AC 1.0 HP Inverter Black",
+		"sku": "HISSPL10HCAS",
+		"slug": "hisense-split-ac-1-0-hp-inverter-black",
+		"price": 459000
+	},
+	{
+		"name": "Hisense Split AC 1.0 HP Normal",
+		"sku": "HISSPL10HPCOPPER",
+		"slug": "hisense-split-ac-1-0-hp-normal",
+		"price": 319000
+	},
+	{
+		"name": "Hisense Split AC 1.0 HP Inverter",
+		"sku": "HISSPL10HPINV",
+		"slug": "hisense-split-ac-1-0-hp-inverter",
+		"price": 497000
+	},
+	{
+		"name": "Hisense Split AC 1.5 HP Inverter Black",
+		"sku": "HISSPL15HCAS",
+		"slug": "hisense-split-ac-1-5-hp-inverter-black",
+		"price": 556800
+	},
+	{
+		"name": "Hisense Split AC 1.5 HP Normal",
+		"sku": "HISSPL15HPCOPPER",
+		"slug": "hisense-split-ac-1-5-hp-normal",
+		"price": 423360
+	},
+	{
+		"name": "Hisense Split AC 1.5 HP Inverter",
+		"sku": "HISSPL15HPINV",
+		"slug": "hisense-split-ac-1-5-hp-inverter",
+		"price": 502680
+	},
+	{
+		"name": "Hisense Split AC 2.0 HP Inverter Black",
+		"sku": "HISSPL20HCAS",
+		"slug": "hisense-split-ac-2-0-hp-inverter-black",
+		"price": 868800
+	},
+	{
+		"name": "Hisense Split AC 2.0 HP Normal",
+		"sku": "HISSPL20HPCOPPER",
+		"slug": "hisense-split-ac-2-0-hp-normal",
+		"price": 598800
+	},
+	{
+		"name": "Hisense Split AC 2.0 HP Inverter",
+		"sku": "HISSPL20HPINV",
+		"slug": "hisense-split-ac-2-0-hp-inverter",
+		"price": 791520
+	},
+	{
+		"name": "Hisense TV QLED 100 Inch E7N 4K Smart",
+		"sku": "HISTV100E7N",
+		"slug": "hisense-tv-qled-100-inch-e7n-4k-smart",
+		"price": 2998750
+	},
+	{
+		"name": "Hisense TV QLED 100 Inch Q7Q 4K Smart 144Hz VRR QLED Gaming TV",
+		"sku": "HISTV100Q7Q",
+		"slug": "hisense-tv-qled-100-inch-q7q-4k-smart-144hz-vrr-qled-gaming-tv",
+		"price": 2916000
+	},
+	{
+		"name": "Hisense TV ULED 100 Inch U7Q 4K Smart MINI LED VRR Gaming TV",
+		"sku": "HISTV100U7Q",
+		"slug": "hisense-tv-uled-100-inch-u7q-4k-smart-mini-led-vrr-gaming-tv",
+		"price": 3358800
+	},
+	{
+		"name": "Hisense TV ULED 100 Inch UX Series RGB-MiniLED 4K 165Hz Smart TV",
+		"sku": "HISTV100UX",
+		"slug": "hisense-tv-uled-100-inch-ux-series-rgb-miniled-4k-165hz-smart-tv",
+		"price": 10725120
+	},
+	{
+		"name": "Hisense TV ULED 116 Inch UX 4K Smart RGB-MiniLED TV",
+		"sku": "HISTV116UX",
+		"slug": "hisense-tv-uled-116-inch-ux-4k-smart-rgb-miniled-tv",
+		"price": 22198800
+	},
+	{
+		"name": "Hisense TV FHD 32 Inch A2Q",
+		"sku": "HISTV32A2Q",
+		"slug": "hisense-tv-fhd-32-inch-a2q",
+		"price": 178800
+	},
+	{
+		"name": "Hisense TV FHD 40 Inch A4S Smart",
+		"sku": "HISTV40A4S",
+		"slug": "hisense-tv-fhd-40-inch-a4s-smart",
+		"price": 418750
+	},
+	{
+		"name": "Hisense TV FHD 43 Inch A4S Smart TV",
+		"sku": "HISTV43A4S",
+		"slug": "hisense-tv-fhd-43-inch-a4s-smart-tv",
+		"price": 453600
+	},
+	{
+		"name": "Hisense TV HD 43 Inch A5200F",
+		"sku": "HISTV43A5200F",
+		"slug": "hisense-tv-hd-43-inch-a5200f",
+		"price": 328800
+	},
+	{
+		"name": "Hisense TV FHD 50 Inch A4Q FHD Smart",
+		"sku": "HISTV50A4Q",
+		"slug": "hisense-tv-fhd-50-inch-a4q-fhd-smart",
+		"price": 504000
+	},
+	{
+		"name": "Hisense TV QLED 50 Inch Q5S FHD Smart 60Hz VIDAA U9",
+		"sku": "HISTV50Q5S",
+		"slug": "hisense-tv-qled-50-inch-q5s-fhd-smart-60hz-vidaa-u9",
+		"price": 544800
+	},
+	{
+		"name": "Hisense TV QLED 50 Inch Q6Q 4K Smart 60Hz VIDAA",
+		"sku": "HISTV50Q6Q",
+		"slug": "hisense-tv-qled-50-inch-q6q-4k-smart-60hz-vidaa",
+		"price": 658800
+	},
+	{
+		"name": "Hisense TV QLED 55 Inch Q6Q 4K Smart",
+		"sku": "HISTV55Q6Q",
+		"slug": "hisense-tv-qled-55-inch-q6q-4k-smart",
+		"price": 762000
+	},
+	{
+		"name": "Hisense TV ULED 55 Inch S7Q 4K Smart TV Mini-LED 144Hz VRR Gaming TV",
+		"sku": "HISTV55S7Q",
+		"slug": "hisense-tv-uled-55-inch-s7q-4k-smart-tv-mini-led-144hz-vrr-gaming-tv",
+		"price": 1186800
+	},
+	{
+		"name": "Hisense TV ULED 55 Inch U6Q 4K Smart Mini LED",
+		"sku": "HISTV55U6Q",
+		"slug": "hisense-tv-uled-55-inch-u6q-4k-smart-mini-led",
+		"price": 872400
+	},
+	{
+		"name": "Hisense TV ULED 55 Inch U7QS 4K Smart TV Mini-LED 144Hz Hi-QLED Gaming TV",
+		"sku": "HISTV55U7S",
+		"slug": "hisense-tv-uled-55-inch-u7qs-4k-smart-tv-mini-led-144hz-hi-qled-gaming-tv",
+		"price": 1075200
+	},
+	{
+		"name": "Hisense TV UHD 58 Inch A6N 4K Smart",
+		"sku": "HISTV58A6N",
+		"slug": "hisense-tv-uhd-58-inch-a6n-4k-smart",
+		"price": 705600
+	},
+	{
+		"name": "Hisense TV 65 Inch A6Q UHD 4K Smart",
+		"sku": "HISTV65A6Q",
+		"slug": "hisense-tv-65-inch-a6q-uhd-4k-smart",
+		"price": 894000
+	},
+	{
+		"name": "Hisense TV QLED 65 Inch Q6Q 4K Smart",
+		"sku": "HISTV65Q6Q",
+		"slug": "hisense-tv-qled-65-inch-q6q-4k-smart",
+		"price": 1018800
+	},
+	{
+		"name": "Hisense TV ULED 65 Inch S7Q 4K Smart TV Mini-LED 144Hz VRR Gaming TV",
+		"sku": "HISTV65S7Q",
+		"slug": "hisense-tv-uled-65-inch-s7q-4k-smart-tv-mini-led-144hz-vrr-gaming-tv",
+		"price": 1474800
+	},
+	{
+		"name": "Hisense TV ULED 65 Inch U6Q 4K Smart Mini LED",
+		"sku": "HISTV65U6Q",
+		"slug": "hisense-tv-uled-65-inch-u6q-4k-smart-mini-led",
+		"price": 1174800
+	},
+	{
+		"name": "Hisense TV ULED 65 Inch U6S 4K Smart Mini LED",
+		"sku": "HISTV65U6S",
+		"slug": "hisense-tv-uled-65-inch-u6s-4k-smart-mini-led",
+		"price": 1264800
+	},
+	{
+		"name": "Hisense TV ULED 65 Inch U7S 4K Smart TV Mini-LED 144Hz Hi-QLED Gaming TV",
+		"sku": "HISTV65U7S",
+		"slug": "hisense-tv-uled-65-inch-u7s-4k-smart-tv-mini-led-144hz-hi-qled-gaming-tv",
+		"price": 1411200
+	},
+	{
+		"name": "Hisense TV ULED 65 Inch U8Q 4K Smart Mini-LED VRR QLED Gaming TV",
+		"sku": "HISTV65U8Q",
+		"slug": "hisense-tv-uled-65-inch-u8q-4k-smart-mini-led-vrr-qled-gaming-tv",
+		"price": 1918800
+	},
+	{
+		"name": "Hisense TV ULED 65 Inch UR8S 4K Smart RGB Mini-LED TV",
+		"sku": "HISTV65UR8S",
+		"slug": "hisense-tv-uled-65-inch-ur8s-4k-smart-rgb-mini-led-tv",
+		"price": 2194800
+	},
+	{
+		"name": "Hisense TV 70 Inch A6Q UHD 4K Smart",
+		"sku": "HISTV70A6Q",
+		"slug": "hisense-tv-70-inch-a6q-uhd-4k-smart",
+		"price": 1198800
+	},
+	{
+		"name": "Hisense TV QLED 75 Inch Q6Q 4K Smart",
+		"sku": "HISTV75Q6Q",
+		"slug": "hisense-tv-qled-75-inch-q6q-4k-smart",
+		"price": 1310400
+	},
+	{
+		"name": "Hisense TV QLED 75 Inch Q7Q 4K Smart 144Hz QLED Gaming TV",
+		"sku": "HISTV75Q7Q",
+		"slug": "hisense-tv-qled-75-inch-q7q-4k-smart-144hz-qled-gaming-tv",
+		"price": 1398000
+	},
+	{
+		"name": "Hisense TV ULED 75 Inch U7S 4K Smart Mini-LED 144Hz TV VIDAA U9",
+		"sku": "HISTV75U7S",
+		"slug": "hisense-tv-uled-75-inch-u7s-4k-smart-mini-led-144hz-tv-vidaa-u9",
+		"price": 1678800
+	},
+	{
+		"name": "Hisense TV ULED 75 Inch U8Q 4K Smart Mini-LED 165Hz VRR Gaming TV",
+		"sku": "HISTV75U8Q",
+		"slug": "hisense-tv-uled-75-inch-u8q-4k-smart-mini-led-165hz-vrr-gaming-tv",
+		"price": 2620800
+	},
+	{
+		"name": "Hisense TV QLED 85 Inch Q6Q 4K Smart",
+		"sku": "HISTV85Q6Q",
+		"slug": "hisense-tv-qled-85-inch-q6q-4k-smart",
+		"price": 2063040
+	},
+	{
+		"name": "Hisense TV ULED 85 Inch UR8S 4K Smart RGB Mini-LED TV",
+		"sku": "HISTV85UR8S",
+		"slug": "hisense-tv-uled-85-inch-ur8s-4k-smart-rgb-mini-led-tv",
+		"price": 3319680
+	},
+	{
+		"name": "Hisense Laser Cinema TV 80-150 Inch Projection Size PX3 4K Smart",
+		"sku": "HISTVLASERPX3",
+		"slug": "hisense-laser-cinema-tv-80-150-inch-projection-size-px3-4k-smart",
+		"price": 3588000
+	},
+	{
+		"name": "Hisense Front Load 10.5KG (WF3S1043BT) Washing Machine",
+		"sku": "HISWM1043BT-WF3S",
+		"slug": "hisense-front-load-10-5kg-wf3s1043bt-washing-machine",
+		"price": 615000
+	},
+	{
+		"name": "Hisense Top Load Twin Tub 5KG (WSPA503) Washing Machine",
+		"sku": "HISWM503WSPA",
+		"slug": "hisense-top-load-twin-tub-5kg-wspa503-washing-machine",
+		"price": 186250
+	},
+	{
+		"name": "Hisense Top Load 20KG (WT5T2025DB) Washing Machine",
+		"sku": "HISWM5T2025DB-WT",
+		"slug": "hisense-top-load-20kg-wt5t2025db-washing-machine",
+		"price": 806250
+	},
+	{
+		"name": "Hisense Front Load 6KG (WFVB6010MS) Washing Machine",
+		"sku": "HISWM6010MS-WFVB",
+		"slug": "hisense-front-load-6kg-wfvb6010ms-washing-machine",
+		"price": 417500
+	},
+	{
+		"name": "LG Soundbar 40W 2.0CH (SK1)",
+		"sku": "LGAUD1SK",
+		"slug": "lg-soundbar-40w-2-0ch-sk1",
+		"price": 111240
+	},
+	{
+		"name": "LG Portable Bluetooth Speaker XBOOM Go (XG2)",
+		"sku": "LGAUD2TBKXG",
+		"slug": "lg-portable-bluetooth-speaker-xboom-go-xg2",
+		"price": 72500
+	},
+	{
+		"name": "LG XBOOM Mini Hi-Fi System 480W (CJ44)",
+		"sku": "LGAUD44CJ",
+		"slug": "lg-xboom-mini-hi-fi-system-480w-cj44",
+		"price": 253000
+	},
+	{
+		"name": "LG XBOOM Mini Hi-Fi System 720W (CJ45)",
+		"sku": "LGAUD45CJ",
+		"slug": "lg-xboom-mini-hi-fi-system-720w-cj45",
+		"price": 303000
+	},
+	{
+		"name": "LG Soundbar with Subwoofer 340W 3.1CH (60TS)",
+		"sku": "LGAUD60TS",
+		"slug": "lg-soundbar-with-subwoofer-340w-3-1ch-60ts",
+		"price": 282500
+	},
+	{
+		"name": "LG XBOOM Mini Hi-Fi System 950W (CL65)",
+		"sku": "LGAUD65CL",
+		"slug": "lg-xboom-mini-hi-fi-system-950w-cl65",
+		"price": 322800
+	},
+	{
+		"name": "LG Home Theater System 600W 4.2CH (LHD667)",
+		"sku": "LGAUD667",
+		"slug": "lg-home-theater-system-600w-4-2ch-lhd667",
+		"price": 282000
+	},
+	{
+		"name": "LG Home Theater System 1250W 4.2CH (LHD687)",
+		"sku": "LGAUD687BG",
+		"slug": "lg-home-theater-system-1250w-4-2ch-lhd687",
+		"price": 400800
+	},
+	{
+		"name": "LG Soundbar with Subwoofer 400W 3.1.1CH (70TYS)",
+		"sku": "LGAUD70TYS",
+		"slug": "lg-soundbar-with-subwoofer-400w-3-1-1ch-70tys",
+		"price": 522000
+	},
+	{
+		"name": "LG XBOOM Mini Hi-Fi System 40W (LK72B)",
+		"sku": "LGAUD72B",
+		"slug": "lg-xboom-mini-hi-fi-system-40w-lk72b",
+		"price": 91000
+	},
+	{
+		"name": "LG Home Theater System 1000W 4.2CH (MR7) Dual Tower Speaker",
+		"sku": "LGAUD7MR",
+		"slug": "lg-home-theater-system-1000w-4-2ch-mr7-dual-tower-speaker",
+		"price": 555600
+	},
+	{
+		"name": "LG XBOOM Party Speaker 450W (RNC7)",
+		"sku": "LGAUD7RNC",
+		"slug": "lg-xboom-party-speaker-450w-rnc7",
+		"price": 418750
+	},
+	{
+		"name": "LG Portable Bluetooth Speaker 120W XBOOM Go (XG8T)",
+		"sku": "LGAUD8TXG",
+		"slug": "lg-portable-bluetooth-speaker-120w-xboom-go-xg8t",
+		"price": 598800
+	},
+	{
+		"name": "LG XBOOM Mini Hi-Fi System (Wahala) 5000W (CK99)",
+		"sku": "LGAUD99CK",
+		"slug": "lg-xboom-mini-hi-fi-system-wahala-5000w-ck99",
+		"price": 1438800
+	},
+	{
+		"name": "LG Home Theater System 1250W 4.2CH (MR9) Dual Tower Speaker",
+		"sku": "LGAUD9MR",
+		"slug": "lg-home-theater-system-1250w-4-2ch-mr9-dual-tower-speaker",
+		"price": 622800
+	},
+	{
+		"name": "LG XBOOM Party Speaker 800W (RNC9)",
+		"sku": "LGAUD9RNC",
+		"slug": "lg-xboom-party-speaker-800w-rnc9",
+		"price": 531250
+	},
+	{
+		"name": "LG Soundbar with Subwoofer 400W 3.1.3CH (SC9S)",
+		"sku": "LGAUD9S-SC",
+		"slug": "lg-soundbar-with-subwoofer-400w-3-1-3ch-sc9s",
+		"price": 739200
+	},
+	{
+		"name": "LG Portable Bluetooth Party Speaker XBOOM 1000W 2.2CH (XL9T)",
+		"sku": "LGAUD9TXL",
+		"slug": "lg-portable-bluetooth-party-speaker-xboom-1000w-2-2ch-xl9t",
+		"price": 990000
+	},
+	{
+		"name": "LG Portable Bluetooth Speaker 5W xboom Mini by will.i.am",
+		"sku": "LGAUDMINI",
+		"slug": "lg-portable-bluetooth-speaker-5w-xboom-mini-by-will-i-am",
+		"price": 64560
+	},
+	{
+		"name": "LG Dehumidifier 28L Dual Inverter with Ionizer MD16GQWE0",
+		"sku": "LGDEH16GQWE0MD",
+		"slug": "lg-dehumidifier-28l-dual-inverter-with-ionizer-md16gqwe0",
+		"price": 550800
+	},
+	{
+		"name": "LG Dehumidifier 34L DUAL Inverter PuriCare™ DD20GMWE1",
+		"sku": "LGDEH20GMWE1DD",
+		"slug": "lg-dehumidifier-34l-dual-inverter-puricare-dd20gmwe1",
+		"price": 622800
+	},
+	{
+		"name": "LG DVD Player with USB Direct Recording (DP132 )",
+		"sku": "LGDVD132DP",
+		"slug": "lg-dvd-player-with-usb-direct-recording-dp132",
+		"price": 41500
+	},
+	{
+		"name": "LG Dishwasher QuadWas True Steam (DFB512FP)",
+		"sku": "LGDW512DFB-FP",
+		"slug": "lg-dishwasher-quadwas-true-steam-dfb512fp",
+		"price": 973750
+	},
+	{
+		"name": "LG Floor Standing AC 10.0 HP Inverter",
+		"sku": "LGFS10HPINVERTER",
+		"slug": "lg-floor-standing-ac-10-0-hp-inverter",
+		"price": 7788000
+	},
+	{
+		"name": "LG Floor Standing AC 2.5 HP Dual Inverter, Smart ThinQ, Smart Care",
+		"sku": "LGFS25N2XA0",
+		"slug": "lg-floor-standing-ac-2-5-hp-dual-inverter-smart-thinq-smart-care",
+		"price": 1978800
+	},
+	{
+		"name": "LG Floor Standing AC 2.0 HP Inverter",
+		"sku": "LGFS2HPINVERTER",
+		"slug": "lg-floor-standing-ac-2-0-hp-inverter",
+		"price": 1471200
+	},
+	{
+		"name": "LG Floor Standing AC 2.0 HP Dual Inverter, Smart ThinQ, Smart Care LG Floor Standing AC 2.0 HP Dual Inverter, Smart ThinQ, Smart Care LG Floor Standing AC 2.0 HP Dual Inverter, Smart ThinQ, Smart Care LG Floor Standing AC 2.0 HP Dual Inverter, Smart ThinQ, Smart Care LG Floor Standing AC 2.0 HP Dual Inverter, Smart ThinQ, Smart Care  About Description: Auto cleaning management ultra fine filter AI dry+ artificial intelligence smart care Dehumidification LED display Related PDFs: LG Warranty Insurance Terms & Conditions .  LG Floor Standing AC 2.0 HP Dual Inverter, Smart ThinQ, Smart Care",
+		"sku": "LGFS2HPN2XA0",
+		"slug": "lg-floor-standing-ac-2-0-hp-dual-inverter-smart-thinq-smart-care-lg-floor-standing-ac-2-0-hp-dual-inverter-smart-thinq-smart-care-lg-floor-standing-ac-2-0-hp-dual-inverter-smart-thinq-smart-care-lg-floor-standing-ac-2-0-hp-dual-inverter-smart-thinq-smart-care-lg-floor-standing-ac-2-0-hp-dual-inverter-smart-thinq-smart-care-about-description-auto-cleaning-management-ultra-fine-filter-ai-dry-artificial-intelligence-smart-care-dehumidification-led-display-related-pdfs-lg-warranty-insurance-terms-conditions-lg-floor-standing-ac-2-0-hp-dual-inverter-smart-thinq-smart-care",
+		"price": 1798800
+	},
+	{
+		"name": "LG Floor Standing AC 3.0 HP Inverter",
+		"sku": "LGFS3HPINVERTER",
+		"slug": "lg-floor-standing-ac-3-0-hp-inverter",
+		"price": 1733880
+	},
+	{
+		"name": "LG Floor Standing AC 5.0 HP Inverter",
+		"sku": "LGFS5HPINVERTER",
+		"slug": "lg-floor-standing-ac-5-0-hp-inverter",
+		"price": 3294000
+	},
+	{
+		"name": "LG Monitor 34 Inch UltraGear™ WQHD (34G600A-B) 160Hz Curved Gaming Monitor",
+		"sku": "LGMON34G600A-B",
+		"slug": "lg-monitor-34-inch-ultragear-wqhd-34g600a-b-160hz-curved-gaming-monitor",
+		"price": 498750
+	},
+	{
+		"name": "LG Microwave 42L 1200W (MH8265CIS)",
+		"sku": "LGMWO8265CIS",
+		"slug": "lg-microwave-42l-1200w-mh8265cis",
+		"price": 298750
+	},
+	{
+		"name": "LG Top Freezer Refrigerator 235L  (GN-B212PFNR)",
+		"sku": "LGREF212PLGB-B",
+		"slug": "lg-top-freezer-refrigerator-235l-gn-b212pfnr",
+		"price": 642500
+	},
+	{
+		"name": "LG Split AC 1.0 HP Dual Inverter with Gen-mode",
+		"sku": "LGSPL10HPGENCOOL-B",
+		"slug": "lg-split-ac-1-0-hp-dual-inverter-with-gen-mode",
+		"price": 544000
+	},
+	{
+		"name": "LG Split AC 1.0 HP Dual Inverter - Advanced…",
+		"sku": "LGSPL10HPINVERTER",
+		"slug": "lg-split-ac-1-0-hp-dual-inverter-advanced",
+		"price": 446500
+	},
+	{
+		"name": "LG Split AC 1.0 HP Standard",
+		"sku": "LGSPL10HPSTANDARD",
+		"slug": "lg-split-ac-1-0-hp-standard",
+		"price": 327750
+	},
+	{
+		"name": "LG Split AC 1.5 HP Inverter Artcool Black Mirror Design",
+		"sku": "LGSPL15HPGENARTMIR",
+		"slug": "lg-split-ac-1-5-hp-inverter-artcool-black-mirror-design",
+		"price": 1066800
+	},
+	{
+		"name": "LG Split AC 1.5 HP Dual Inverter with Gen-mode",
+		"sku": "LGSPL15HPGENCOOL-B",
+		"slug": "lg-split-ac-1-5-hp-dual-inverter-with-gen-mode",
+		"price": 664800
+	},
+	{
+		"name": "LG Split AC 1.5 HP Dual Inverter - Advanced Features",
+		"sku": "LGSPL15HPINVERTER",
+		"slug": "lg-split-ac-1-5-hp-dual-inverter-advanced-features",
+		"price": 549600
+	},
+	{
+		"name": "LG Split AC 1.5 HP Standard",
+		"sku": "LGSPL15HPSTANDARD",
+		"slug": "lg-split-ac-1-5-hp-standard",
+		"price": 358799.68
+	},
+	{
+		"name": "LG Split AC 2.0 HP Inverter Artcool Black Mirror Design",
+		"sku": "LGSPL20HPGENARTMR",
+		"slug": "lg-split-ac-2-0-hp-inverter-artcool-black-mirror-design",
+		"price": 1276800
+	},
+	{
+		"name": "LG Split AC 2.0 HP Dual Inverter with Gen-mode",
+		"sku": "LGSPL20HPGENCOOL-B",
+		"slug": "lg-split-ac-2-0-hp-dual-inverter-with-gen-mode",
+		"price": 979200
+	},
+	{
+		"name": "LG Split AC 2.0 HP Dual Inverter - Advanced Features",
+		"sku": "LGSPL20HPINVERTER",
+		"slug": "lg-split-ac-2-0-hp-dual-inverter-advanced-features",
+		"price": 873750
+	},
+	{
+		"name": "LG Split AC 2.5 HP Dual Inverter with Gen-mode",
+		"sku": "LGSPL25HPGENCOL-B",
+		"slug": "lg-split-ac-2-5-hp-dual-inverter-with-gen-mode",
+		"price": 1198800
+	},
+	{
+		"name": "LG TV QNED 100 Inch QNED86A6 4K Smart TV AI Magic Remote webOS24",
+		"sku": "LGTV100QNED86A6",
+		"slug": "lg-tv-qned-100-inch-qned86a6-4k-smart-tv-ai-magic-remote-webos24",
+		"price": 5308800
+	},
+	{
+		"name": "LG TV FHD 43 Inch LR600 Smart",
+		"sku": "LGTV43LR60006LA",
+		"slug": "lg-tv-fhd-43-inch-lr600-smart",
+		"price": 450000
+	},
+	{
+		"name": "LG TV UHD 43 Inch UA73 4K Smart TV Ready HDR10 webOS25",
+		"sku": "LGTV43UA73006LA",
+		"slug": "lg-tv-uhd-43-inch-ua73-4k-smart-tv-ready-hdr10-webos25",
+		"price": 477600
+	},
+	{
+		"name": "LG TV NANO 50 Inch NU850B6LA 4K Smart TV, Alpha 7 AI Processor Gen9, webOS 26",
+		"sku": "LGTV50NU850B6LA",
+		"slug": "lg-tv-nano-50-inch-nu850b6la-4k-smart-tv-alpha-7-ai-processor-gen9-webos-26",
+		"price": 638400
+	},
+	{
+		"name": "LG TV UHD 50 Inch UA73 4K Smart TV Ready HDR10 webOS25",
+		"sku": "LGTV50UA73006LA",
+		"slug": "lg-tv-uhd-50-inch-ua73-4k-smart-tv-ready-hdr10-webos25",
+		"price": 598800
+	},
+	{
+		"name": "LG TV OLED 55 Inch C5 4K Smart TV AI Magic Remote webOS25 2025",
+		"sku": "LGTV55C56LA",
+		"slug": "lg-tv-oled-55-inch-c5-4k-smart-tv-ai-magic-remote-webos25-2025",
+		"price": 2038800
+	},
+	{
+		"name": "LG TV OLED 55 Inch C6 4K Smart TV evo AI Magic Remote webOS26 2026",
+		"sku": "LGTV55C66LA",
+		"slug": "lg-tv-oled-55-inch-c6-4k-smart-tv-evo-ai-magic-remote-webos26-2026",
+		"price": 1678800
+	},
+	{
+		"name": "LG TV NanoCell 55 Inch NANO80T6A 4K Smart TV AI Magic remote HDR10 webOS24",
+		"sku": "LGTV55NANO80T6A",
+		"slug": "lg-tv-nanocell-55-inch-nano80t6a-4k-smart-tv-ai-magic-remote-hdr10-webos24",
+		"price": 853200
+	},
+	{
+		"name": "LG TV QNED 55 Inch QNED72B6T 4K Smart TV Alpha 7 AI Processor Gen9, webOS 26",
+		"sku": "LGTV55QNED72B6T",
+		"slug": "lg-tv-qned-55-inch-qned72b6t-4k-smart-tv-alpha-7-ai-processor-gen9-webos-26",
+		"price": 898800
+	},
+	{
+		"name": "LG TV UHD 55 Inch UA73 4K Smart TV Ready HDR10 webOS25",
+		"sku": "LGTV55UA73006LA",
+		"slug": "lg-tv-uhd-55-inch-ua73-4k-smart-tv-ready-hdr10-webos25",
+		"price": 709200
+	},
+	{
+		"name": "LG TV UHD 55 Inch UT73 4K Smart TV AI Magic remote HDR10 webOS24",
+		"sku": "LGTV55UT73006LA",
+		"slug": "lg-tv-uhd-55-inch-ut73-4k-smart-tv-ai-magic-remote-hdr10-webos24",
+		"price": 618750
+	},
+	{
+		"name": "LG TV OLED 65 Inch C6 4K Smart TV evo AI Magic Remote webOS26 2026",
+		"sku": "LGTV65C66LA",
+		"slug": "lg-tv-oled-65-inch-c6-4k-smart-tv-evo-ai-magic-remote-webos26-2026",
+		"price": 2275800
+	},
+	{
+		"name": "LG TV QNED 65 Inch QNED72B6T 4K Smart TV",
+		"sku": "LGTV65QNED72B6T",
+		"slug": "lg-tv-qned-65-inch-qned72b6t-4k-smart-tv",
+		"price": 1160000
+	},
+	{
+		"name": "LG TV QNED 65 Inch QNED82A6A 4K Smart TV AI Magic remote webOS25",
+		"sku": "LGTV65QNED82A6A",
+		"slug": "lg-tv-qned-65-inch-qned82a6a-4k-smart-tv-ai-magic-remote-webos25",
+		"price": 1498750
+	},
+	{
+		"name": "LG TV UHD 65 Inch UA73 4K Smart TV AI Magic Remote Ready webOS25",
+		"sku": "LGTV65UA73006LA",
+		"slug": "lg-tv-uhd-65-inch-ua73-4k-smart-tv-ai-magic-remote-ready-webos25",
+		"price": 1006560
+	},
+	{
+		"name": "LG TV NanoCell 75 Inch NANO80T6A 4K Smart",
+		"sku": "LGTV75NANO80T6A",
+		"slug": "lg-tv-nanocell-75-inch-nano80t6a-4k-smart",
+		"price": 1848000
+	},
+	{
+		"name": "LG TV NANO 75 Inch NU850B6LA 4K Smart TV, Alpha 7 AI Processor Gen9, webOS 26",
+		"sku": "LGTV75NU850B6LA",
+		"slug": "lg-tv-nano-75-inch-nu850b6la-4k-smart-tv-alpha-7-ai-processor-gen9-webos-26",
+		"price": 1258800
+	},
+	{
+		"name": "LG TV QNED 75 Inch QNED82A6A 4K Smart TV AI Magic remote webOS25",
+		"sku": "LGTV75QNED82A6A",
+		"slug": "lg-tv-qned-75-inch-qned82a6a-4k-smart-tv-ai-magic-remote-webos25",
+		"price": 1687500
+	},
+	{
+		"name": "LG TV UHD 75 Inch UA85 4K Smart AI Magic Remote webOS25 2025",
+		"sku": "LGTV75UA85006LA",
+		"slug": "lg-tv-uhd-75-inch-ua85-4k-smart-ai-magic-remote-webos25-2025",
+		"price": 1290000
+	},
+	{
+		"name": "LG TV OLED 77 Inch C6 4K Smart TV with Alpha 11 AI Processor Gen3 2026",
+		"sku": "LGTV77C66LA",
+		"slug": "lg-tv-oled-77-inch-c6-4k-smart-tv-with-alpha-11-ai-processor-gen3-2026",
+		"price": 4798800
+	},
+	{
+		"name": "LG TV OLED 77 Inch G5 4K Smart AI Magic Remote webOS25 2025",
+		"sku": "LGTV77G56LA",
+		"slug": "lg-tv-oled-77-inch-g5-4k-smart-ai-magic-remote-webos25-2025",
+		"price": 5308800
+	},
+	{
+		"name": "LG TV OLED 77 Inch G6 4K Smart TV evo AI G6 4K SmartTV 2026",
+		"sku": "LGTV77G66LW",
+		"slug": "lg-tv-oled-77-inch-g6-4k-smart-tv-evo-ai-g6-4k-smarttv-2026",
+		"price": 5398800
+	},
+	{
+		"name": "LG TV OLED 83 Inch C5 4K Smart TV AI Magic Remote webOS25",
+		"sku": "LGTV83C56LA",
+		"slug": "lg-tv-oled-83-inch-c5-4k-smart-tv-ai-magic-remote-webos25",
+		"price": 7020000
+	},
+	{
+		"name": "LG TV OLED 83 Inch G6 4K Smart TV evo AI G6 4K SmartTV 2026",
+		"sku": "LGTV83G66LW",
+		"slug": "lg-tv-oled-83-inch-g6-4k-smart-tv-evo-ai-g6-4k-smarttv-2026",
+		"price": 7996800
+	},
+	{
+		"name": "LG TV QNED 85 Inch QNED72B6T 4K Smart TV",
+		"sku": "LGTV85QNED72B6T",
+		"slug": "lg-tv-qned-85-inch-qned72b6t-4k-smart-tv",
+		"price": 2388000
+	},
+	{
+		"name": "LG TV 86 Inch NanoCell 4K Smart with AI Magic Remote",
+		"sku": "LGTV86NANO80T6A",
+		"slug": "lg-tv-86-inch-nanocell-4k-smart-with-ai-magic-remote",
+		"price": 2682000
+	},
+	{
+		"name": "LG TV UHD 86 Inch UA85 4K Smart AI Magic Remote webOS25 2025",
+		"sku": "LGTV86UA85006LA",
+		"slug": "lg-tv-uhd-86-inch-ua85-4k-smart-ai-magic-remote-webos25-2025",
+		"price": 1948800
+	},
+	{
+		"name": "LG TV OLED 97 Inch G6 4K Smart TV evo AI 2026 α11 AI Processor Gen3",
+		"sku": "LGTV97G66LW",
+		"slug": "lg-tv-oled-97-inch-g6-4k-smart-tv-evo-ai-2026-11-ai-processor-gen3",
+		"price": 36600000
+	},
+	{
+		"name": "LG TV UHD 98 Inch UT90 4K Smart TV AI Magic Remote webOS24",
+		"sku": "LGTV98UT90006LA",
+		"slug": "lg-tv-uhd-98-inch-ut90-4k-smart-tv-ai-magic-remote-webos24",
+		"price": 3960000
+	},
+	{
+		"name": "LG Top Load Twin Tub 18KG (1861RWNT) Washing Machine",
+		"sku": "LGWM1861RWNT",
+		"slug": "lg-top-load-twin-tub-18kg-1861rwnt-washing-machine",
+		"price": 543750
+	},
+	{
+		"name": "LG Top Load 19KG (T19V1NDHT2) Washing Machine",
+		"sku": "LGWM19V1NDHT2",
+		"slug": "lg-top-load-19kg-t19v1ndht2-washing-machine",
+		"price": 873750
+	},
+	{
+		"name": "LG Top Load 8KG (T8585NDHV) Washing Machine",
+		"sku": "LGWM8585NDHV-T",
+		"slug": "lg-top-load-8kg-t8585ndhv-washing-machine",
+		"price": 465125
+	},
+	{
+		"name": "LG Front Load Wash & Dry 15/8KG (F0L9DGP2S) Washing Machine",
+		"sku": "LGWM9DGP2S-F0L",
+		"slug": "lg-front-load-wash-dry-15-8kg-f0l9dgp2s-washing-machine",
+		"price": 1562500
+	},
+	{
+		"name": "Maxi Gas Cooker 50x50 CM (4) Burners Black & Grey (BASIC)",
+		"sku": "MAXI50504BBASICBG",
+		"slug": "maxi-gas-cooker-50x50-cm-4-burners-black-grey-basic",
+		"price": 193750
+	},
+	{
+		"name": "Maxi Air Purifier 22 Watts Hepa Filter",
+		"sku": "MAXIAP200G-Z41",
+		"slug": "maxi-air-purifier-22-watts-hepa-filter",
+		"price": 95880
+	},
+	{
+		"name": "Maxi Blender 1500W 1.5L Silver (BL1501)",
+		"sku": "MAXIBLE1501W",
+		"slug": "maxi-blender-1500w-1-5l-silver-bl1501",
+		"price": 148750
+	},
+	{
+		"name": "Maxi Tabletop Gas Cooker 4 Burners (BE001) Stainless Steel",
+		"sku": "MAXIBURNERBE001",
+		"slug": "maxi-tabletop-gas-cooker-4-burners-be001-stainless-steel",
+		"price": 235250
+	},
+	{
+		"name": "Maxi Dehumidifier 12L (12DEN7)",
+		"sku": "MAXIDH12DEN7",
+		"slug": "maxi-dehumidifier-12l-12den7",
+		"price": 160800
+	},
+	{
+		"name": "Maxi Dehumidifier 30L (30DEN7)",
+		"sku": "MAXIDH30DEN7",
+		"slug": "maxi-dehumidifier-30l-30den7",
+		"price": 250800
+	},
+	{
+		"name": "Maxi Bladeless Fan 42 Inch Black (150PD-AMS)",
+		"sku": "MAXIFAN150PD-AMS",
+		"slug": "maxi-bladeless-fan-42-inch-black-150pd-ams",
+		"price": 223750
+	},
+	{
+		"name": "Maxi Generator 1.25kVa | 1.0kW | Manual (E10M)",
+		"sku": "MAXIGEN10EM",
+		"slug": "maxi-generator-1-25kva-1-0kw-manual-e10m",
+		"price": 248750
+	},
+	{
+		"name": "Maxi Portable Generator 1100W (MS1100i)",
+		"sku": "MAXIGEN1100I-MS",
+		"slug": "maxi-portable-generator-1100w-ms1100i",
+		"price": 385000
+	},
+	{
+		"name": "Maxi Kitchen Machine Mixer 600W (MJ-KM6001W)",
+		"sku": "MAXIMIXER6001KM",
+		"slug": "maxi-kitchen-machine-mixer-600w-mj-km6001w",
+		"price": 108750
+	},
+	{
+		"name": "Maxi Portable AC 1.0 HP (CRN7)",
+		"sku": "MAXIPAC10HPCRN7",
+		"slug": "maxi-portable-ac-1-0-hp-crn7",
+		"price": 298800
+	},
+	{
+		"name": "Maxi Portable AC 1.5 HP (CRN7)",
+		"sku": "MAXIPAC15HPCRN7",
+		"slug": "maxi-portable-ac-1-5-hp-crn7",
+		"price": 388800
+	},
+	{
+		"name": "Maxi Split AC 1.0 HP Inverter",
+		"sku": "MAXISPL10INV01-M",
+		"slug": "maxi-split-ac-1-0-hp-inverter",
+		"price": 363000
+	},
+	{
+		"name": "Maxi Split AC 1.5 HP Inverter",
+		"sku": "MAXISPL15INV01-M",
+		"slug": "maxi-split-ac-1-5-hp-inverter",
+		"price": 420000
+	},
+	{
+		"name": "Maxi TV HD 43 Inch D2010",
+		"sku": "MAXITV43D2010",
+		"slug": "maxi-tv-hd-43-inch-d2010",
+		"price": 306000
+	},
+	{
+		"name": "Maxi Rubi TV Stand 120CM (Off White)",
+		"sku": "MAXITVSTANDRUBI160",
+		"slug": "maxi-rubi-tv-stand-120cm-off-white",
+		"price": 102500
+	},
+	{
+		"name": "Maxi UPS 3KVA LED Version",
+		"sku": "MAXIUPS3KDG",
+		"slug": "maxi-ups-3kva-led-version",
+		"price": 268750
+	},
+	{
+		"name": "Maxi Water Heater 15L 2000W (15-20VE)",
+		"sku": "MAXIWH15-20VE",
+		"slug": "maxi-water-heater-15l-2000w-15-20ve",
+		"price": 87375
+	},
+	{
+		"name": "Samsun 55-inch Smart Tv",
+		"sku": "SAM TV 0001",
+		"slug": "samsun-55-inch-smart-tv",
+		"price": 700000
+	},
+	{
+		"name": "TV",
+		"sku": "SAM-TV-001",
+		"slug": "tv",
+		"price": 500
+	},
+	{
+		"name": "Hisense TV 55 Inch A6Q UHD 4K Smart",
+		"sku": "SKU:HISTV55A6Q",
+		"slug": "hisense-tv-55-inch-a6q-uhd-4k-smart",
+		"price": 719040
+	}
+]
