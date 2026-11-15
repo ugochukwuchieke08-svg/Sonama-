@@ -63,6 +63,115 @@ const DEFAULT_FEATURES = [
 const formatPrice = (price: number) =>
   `₦${Number(price || 0).toLocaleString("en-NG")}`;
 
+type ProductDocument = {
+  title: string;
+  url: string;
+};
+
+type ParsedProductDescription = {
+  specifications: {
+    label: string;
+    value: string;
+  }[];
+  documents: ProductDocument[];
+  fallbackDescription: string;
+};
+
+function parseProductDescription(
+  description: string | null
+): ParsedProductDescription {
+  if (!description?.trim()) {
+    return {
+      specifications: [],
+      documents: [],
+      fallbackDescription: "",
+    };
+  }
+
+  const text = description.trim();
+
+  // Extract related PDF documents.
+  const documents: ProductDocument[] = [];
+
+  const documentRegex =
+    /\[([^\]]+)\]\s*\\?\(\s*\[?(https?:\/\/[^\s\])]+)(?:\]\([^)]*\))?\s*\)?/gi;
+
+  let documentMatch;
+
+  while (
+    (documentMatch = documentRegex.exec(text)) !== null
+  ) {
+    const title = documentMatch[1].trim();
+
+    const url = documentMatch[2]
+      .replace(/\\_/g, "_")
+      .replace(/[.,;]+$/, "");
+
+    try {
+      const parsedUrl = new URL(url);
+
+      if (
+        parsedUrl.protocol === "https:" ||
+        parsedUrl.protocol === "http:"
+      ) {
+        documents.push({
+          title,
+          url: parsedUrl.toString(),
+        });
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  // Extract the description section.
+  const descriptionSection =
+    text.split(/####?\s*Related PDFs\s*:/i)[0] || "";
+
+  const cleanedDescription = descriptionSection
+    .replace(/####?\s*Description\s*:/i, "")
+    .replace(/^\s*#+\s*/gm, "")
+    .replace(/\s+-\s+/g, "\n")
+    .replace(/^\s*-\s*/gm, "")
+    .trim();
+
+  // Convert technical specifications into structured data.
+  const specifications: {
+    label: string;
+    value: string;
+  }[] = [];
+
+  const lines = cleanedDescription
+    .split(/\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  for (const line of lines) {
+    const match = line.match(/^([^:]+):\s*(.+)$/);
+
+    if (match) {
+      specifications.push({
+        label: match[1].trim(),
+        value: match[2].trim(),
+      });
+    }
+  }
+
+  // Clean fallback for descriptions that don't follow
+  // the supplier's technical specification format.
+  const fallbackDescription = cleanedDescription
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/[*#_`]/g, "")
+    .trim();
+
+  return {
+    specifications,
+    documents,
+    fallbackDescription,
+  };
+}
+
 function formatProduct(data: any): Product {
   return {
     id: String(data.id),
@@ -126,84 +235,92 @@ const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [kitSelected, setKitSelected] = useState(false);
   const [insuranceSelected, setInsuranceSelected] = useState(false);
 
+  const parsedDescription = useMemo(
+  () => parseProductDescription(product?.description ?? null),
+  [product?.description]
+);
+
   // Fetch product details and related products.
-  const fetchProduct = useCallback(async () => {
-    if (!productId) {
+ const fetchProduct = useCallback(async () => {
+  if (!productId) {
+    setProduct(null);
+    setLoadError("Product ID is missing.");
+    setLoading(false);
+    return;
+  }
+
+  setLoading(true);
+  setLoadError("");
+  setProduct(null);
+  setRelatedProducts([]);
+
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", productId)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(
+        [error.message, error.details, error.hint]
+          .filter(Boolean)
+          .join(" — ") || "Failed to retrieve product."
+      );
+    }
+
+    if (!data) {
       setProduct(null);
-      setLoadError("Product ID is missing.");
-      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    setLoadError("");
-    setProduct(null);
-    setRelatedProducts([]);
+    const selectedProduct = formatProduct(data);
 
-    try {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", productId)
-        .eq("is_active", true)
-        .maybeSingle();
+    setProduct(selectedProduct);
+    setActiveImageIndex(0);
 
-      if (error) {
-        console.error("Supabase product error:", error);
+    setInstallationSelected(false);
+    setKitSelected(false);
+    setInsuranceSelected(false);
+    setQuantity(1);
 
-        throw new Error(
-          [error.message, error.details, error.hint]
-            .filter(Boolean)
-            .join(" — ") || "Failed to retrieve product."
-        );
-      }
+    // The main product is loaded.
+    // Don't make the customer wait for related products.
+    setLoading(false);
 
-      if (!data) {
-        setProduct(null);
-        return;
-      }
+    // Fetch related products separately.
+    const {
+      data: relatedData,
+      error: relatedError,
+    } = await supabase
+      .from("products")
+      .select("*")
+      .eq("is_active", true)
+      .neq("id", productId)
+      .order("is_featured", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(3);
 
-      const selectedProduct = formatProduct(data);
-
-      setProduct(selectedProduct);
-      setActiveImageIndex(0);
-
-      setInstallationSelected(false);
-      setKitSelected(false);
-      setInsuranceSelected(false);
-      setQuantity(1);
-
-      const {
-        data: relatedData,
-        error: relatedError,
-      } = await supabase
-        .from("products")
-        .select("*")
-        .eq("is_active", true)
-        .neq("id", productId)
-        .order("is_featured", { ascending: false })
-        .order("created_at", { ascending: false })
-        .limit(3);
-
-      if (relatedError) {
-        console.error("Related products error:", relatedError);
-      } else {
-        setRelatedProducts(
-          (relatedData ?? []).map((item: any) => formatProduct(item))
-        );
-      }
-    } catch (error: unknown) {
-      console.error("Failed to load product:", error);
-
-      setLoadError(
-        error instanceof Error
-          ? error.message
-          : "We couldn't load this product. Please try again."
+    if (relatedError) {
+      console.error("Related products error:", relatedError);
+    } else {
+      setRelatedProducts(
+        (relatedData ?? []).map((item: any) => formatProduct(item))
       );
-    } finally {
-      setLoading(false);
     }
-  }, [productId, supabase]);
+  } catch (error: unknown) {
+    console.error("Failed to load product:", error);
+
+    setLoadError(
+      error instanceof Error
+        ? error.message
+        : "We couldn't load this product. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+}, [productId, supabase]);
 
   useEffect(() => {
     fetchProduct();
@@ -393,6 +510,7 @@ const handleGalleryTouchEnd = (
       ? product.features
       : DEFAULT_FEATURES;
 
+
   const cartQuantity = cart
   .filter((item) => item.id === product.id)
   .reduce((total, item) => total + item.quantity, 0);
@@ -419,7 +537,7 @@ const handleGalleryTouchEnd = (
   const orderSubtotal = unitTotal * quantity;
 
   return (
-    <main className="min-h-screen bg-[#fafafa] text-[#171923]">
+    <main className="min-h-screen w-full overflow-x-clip bg-[#fafafa] text-[#171923]">
       {/* Announcement bar */}
       <div className="bg-[#142d4e] px-4 py-2.5 text-center text-xs font-medium tracking-wide text-white sm:text-sm">
         Quality home appliances. Shopping made simple.
@@ -463,9 +581,9 @@ const handleGalleryTouchEnd = (
 </header>
       {/* Product details */}
       <section className="mx-auto max-w-[1440px] px-5 pb-16 pt-6 sm:px-8 sm:pb-24 lg:px-12">
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
+        <div className="grid w-full min-w-0 grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-14">
          {/* Product Image Gallery */}
-<div className="space-y-4">
+<div className="min-w-0 w-full space-y-4">
   <div
     className="relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-[26px] border border-gray-100 bg-white p-8 sm:min-h-[480px] sm:p-12"
     onTouchStart={handleGalleryTouchStart}
@@ -566,14 +684,14 @@ const handleGalleryTouchEnd = (
 </div>
 
           {/* Product information */}
-          <div className="flex flex-col justify-center py-2">
+          <div className="flex min-w-0 w-full flex-col justify-center py-2">
             <p className="text-xs font-black uppercase tracking-[0.22em] text-[#1769e0]">
               {product.sku
                 ? `${product.sku} · ${product.category}`
                 : product.category}
             </p>
 
-            <h1 className="mt-4 text-3xl font-black leading-tight tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
+            <h1 className="mt-4 min-w-0 max-w-full break-words text-3xl font-black leading-tight tracking-tight text-gray-900 [overflow-wrap:anywhere] sm:text-4xl lg:text-5xl">
               {product.name}
             </h1>
 
@@ -585,10 +703,111 @@ const handleGalleryTouchEnd = (
 
             <div className="mt-7 h-px bg-gray-200" />
 
-            <p className="mt-7 text-sm leading-7 text-gray-600 sm:text-base">
-              {product.description ||
-                `Discover the ${product.name} at Sonama Wills. Contact us to confirm product specifications, availability, and delivery options before purchasing.`}
-            </p>
+           {/* Product Description */}
+<div className="mt-7 w-full min-w-0 max-w-full">
+
+  <h2 className="text-lg font-black text-gray-900">
+    Product Description
+  </h2>
+
+  {/* General description */}
+  {parsedDescription.fallbackDescription &&
+    parsedDescription.specifications.length === 0 && (
+      <div className="mt-3 rounded-xl bg-white p-5">
+        <p className="whitespace-pre-line break-words text-sm leading-7 text-gray-600 [overflow-wrap:anywhere]">
+          {parsedDescription.fallbackDescription}
+        </p>
+      </div>
+    )}
+
+  {/* Technical Specifications */}
+  {parsedDescription.specifications.length > 0 && (
+    <div className="mt-4 overflow-hidden rounded-2xl border border-gray-100 bg-white">
+
+      <div className="border-b border-gray-100 px-5 py-4">
+        <h3 className="text-sm font-black text-gray-900">
+          Technical Specifications
+        </h3>
+
+        <p className="mt-1 text-xs text-gray-500">
+          Product specifications and technical details.
+        </p>
+      </div>
+
+      <div className="divide-y divide-gray-100">
+
+        {parsedDescription.specifications.map(
+          (specification, index) => (
+            <div
+              key={`${specification.label}-${index}`}
+              className="grid grid-cols-2 gap-4 px-5 py-4"
+            >
+              <span className="text-xs font-semibold text-gray-500 sm:text-sm">
+                {specification.label}
+              </span>
+
+              <span className="break-words text-right text-xs font-bold text-gray-900 [overflow-wrap:anywhere] sm:text-sm">
+                {specification.value}
+              </span>
+            </div>
+          )
+        )}
+
+      </div>
+    </div>
+  )}
+
+  {/* Product Documents */}
+  {parsedDescription.documents.length > 0 && (
+    <div className="mt-5">
+
+      <h3 className="text-sm font-black text-gray-900">
+        Product Documents
+      </h3>
+
+      <div className="mt-3 grid gap-3">
+
+        {parsedDescription.documents.map(
+          (document, index) => (
+            <a
+              key={`${document.title}-${index}`}
+              href={document.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-4 transition hover:border-[#1769e0] hover:bg-blue-50/30"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-[#1769e0]">
+                  <ArrowUpRight size={20} />
+                </div>
+
+                <div className="min-w-0">
+                  <p className="break-words text-sm font-bold text-gray-900">
+                    {document.title}
+                  </p>
+
+                  <p className="mt-1 text-xs text-gray-500">
+                    PDF Document · Open document
+                  </p>
+                </div>
+
+              </div>
+
+              <ArrowUpRight
+                size={18}
+                className="shrink-0 text-gray-400"
+              />
+
+            </a>
+          )
+        )}
+
+      </div>
+    </div>
+  )}
+
+</div>
 
             {/* Product highlights */}
             <div className="mt-7">

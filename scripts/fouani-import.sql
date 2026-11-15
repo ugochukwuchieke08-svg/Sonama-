@@ -14,7 +14,7 @@ INSERT INTO public.products (
   price,
   stock_quantity,
   image_url,
-  image_urls,
+  image_urls, 
   is_active,
   is_featured,
   brand
