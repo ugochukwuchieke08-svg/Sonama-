@@ -12,7 +12,6 @@ import {
   AlertCircle,
   CheckCircle2,
 } from "lucide-react";
-
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminDashboardPage() {
