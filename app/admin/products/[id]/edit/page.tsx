@@ -323,6 +323,7 @@ const supabase = createClient();
     .update({
       name: form.name.trim(),
       slug,
+      reviewed_at: new Date().toISOString(),
       sku: form.sku.trim() || null,
       category: form.category.trim(),
       description: form.description.trim(),
