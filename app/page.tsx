@@ -1118,16 +1118,6 @@ useEffect(() => {
                           ? "In stock"
                           : "Currently unavailable"}
                       </p>
-
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          orderOnWhatsApp(product);
-                        }}
-                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-md border border-[#1769e0] py-2.5 text-[10px] font-bold text-[#1769e0] transition duration-300 hover:bg-[#1769e0] hover:text-white sm:text-xs"
-                      >
-                        Enquire Now <ArrowUpRight size={14} />
-                      </button>
                     </div>
                   </article>
                 ))}

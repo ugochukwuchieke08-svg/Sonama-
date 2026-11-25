@@ -286,6 +286,14 @@ const placeOrder = async (event: FormEvent<HTMLFormElement>) => {
   setIsSubmitting(true);
 
   try {
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+console.log("CHECKOUT AUTH DEBUG:", {
+  hasUser: !!user,
+  userId: user?.id,
+  authError: authError?.message,
+});
     const response = await fetch("/api/orders", {
       method: "POST",
       headers: {

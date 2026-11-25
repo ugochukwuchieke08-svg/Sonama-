@@ -405,8 +405,6 @@ export async function POST(request: Request) {
         insurance_selected: item.insuranceSelected,
         insurance_price: insurancePrice,
 
-        // Complete price including extras.
-        line_total: lineTotal,
       });
     }
 
